@@ -7,7 +7,10 @@
 <div class="card-custom animate-fade-in">
     <div class="card-header border-bottom">
         <div class="d-flex justify-content-between align-items-center w-100">
-            <span><i class="bi bi-people-fill me-2"></i> Data Tenaga Outsourcing</span>
+            <span>
+                <i class="bi bi-people-fill me-2 text-primary"></i> Data Tenaga Outsourcing
+                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 rounded-pill">{{ $outsourcings->total() }} Data</span>
+            </span>
             <div>
                 <button type="button" class="btn btn-sm btn-success-custom" data-bs-toggle="modal" data-bs-target="#importModal">
                     <i class="bi bi-file-earmark-arrow-up me-1"></i> Import
@@ -52,7 +55,11 @@
                             @if($item->photo)
                                 <img src="{{ asset('storage/' . $item->photo) }}" alt="Foto" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                             @else
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold;">
+                                @php
+                                    $colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                                    $bgColor = $colors[strlen($item->name) % count($colors)];
+                                @endphp
+                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold; background: linear-gradient(135deg, {{ $bgColor }}, #1e293b);">
                                     {{ strtoupper(substr($item->name, 0, 1)) }}
                                 </div>
                             @endif

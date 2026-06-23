@@ -20,6 +20,12 @@
     </a>
     <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
         <i class="bi bi-envelope-paper-fill"></i> Izin/Sakit
+        @php
+            $pendingCount = \App\Models\Permission::where('status_approval', 'pending')->count();
+        @endphp
+        @if($pendingCount > 0)
+            <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.6rem; animation: pulse-glow 2s infinite;">{{ $pendingCount }}</span>
+        @endif
     </a>
     <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
         <i class="bi bi-file-earmark-bar-graph-fill"></i> Laporan

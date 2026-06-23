@@ -4,6 +4,22 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+<div class="row mb-4 animate-fade-in">
+    <div class="col-12">
+        <h4 class="fw-bold" style="color: #0f172a;">
+            @php
+                $hour = now()->format('H');
+                if ($hour < 12) $greeting = 'Selamat Pagi';
+                elseif ($hour < 15) $greeting = 'Selamat Siang';
+                elseif ($hour < 18) $greeting = 'Selamat Sore';
+                else $greeting = 'Selamat Malam';
+            @endphp
+            {{ $greeting }}, {{ auth()->user()->name ?? 'Admin' }}! 👋
+        </h4>
+        <p class="text-muted mb-0">Berikut adalah ringkasan sistem absensi hari ini.</p>
+    </div>
+</div>
+
 <div class="row g-3 mb-4">
     <!-- Stat Cards -->
     <div class="col-xl-3 col-md-6 animate-fade-in">

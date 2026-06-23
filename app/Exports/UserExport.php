@@ -59,13 +59,13 @@ class UserExport implements FromCollection, WithHeadings, WithMapping, ShouldAut
         if ($user->employee_type === 'outsourcing' && $user->outsourcingEmployee) {
             $orgName = $user->outsourcingEmployee->company_name;
             $position = $user->outsourcingEmployee->position;
-            $startDate = $user->outsourcingEmployee->contract_start->format('d/m/Y');
-            $endDate = $user->outsourcingEmployee->contract_end->format('d/m/Y');
+            $startDate = $user->outsourcingEmployee->contract_start ? $user->outsourcingEmployee->contract_start->format('d/m/Y') : '-';
+            $endDate = $user->outsourcingEmployee->contract_end ? $user->outsourcingEmployee->contract_end->format('d/m/Y') : '-';
         } elseif ($user->employee_type === 'magang' && $user->internshipParticipant) {
             $orgName = $user->internshipParticipant->institution;
             $position = $user->internshipParticipant->major;
-            $startDate = $user->internshipParticipant->start_date->format('d/m/Y');
-            $endDate = $user->internshipParticipant->end_date->format('d/m/Y');
+            $startDate = $user->internshipParticipant->start_date ? $user->internshipParticipant->start_date->format('d/m/Y') : '-';
+            $endDate = $user->internshipParticipant->end_date ? $user->internshipParticipant->end_date->format('d/m/Y') : '-';
         }
 
         return [

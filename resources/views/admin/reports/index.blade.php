@@ -39,26 +39,26 @@
 
 <div class="row g-3 mb-4 animate-fade-in" style="animation-delay: 0.1s;">
     <div class="col-md-3 col-6">
-        <div class="card-custom bg-success bg-opacity-10 text-success border-success text-center py-3">
-            <h3 class="fw-bold mb-0">{{ $summary['hadir'] ?? 0 }}</h3>
+        <div class="card-custom bg-success bg-opacity-10 text-success border-success text-center py-3 shadow-sm hover-shadow" style="transition: all 0.3s ease;">
+            <h3 class="fw-bold mb-0"><i class="bi bi-check-circle me-2"></i>{{ $summary['hadir'] ?? 0 }}</h3>
             <div class="small fw-semibold mt-1">Total Hadir</div>
         </div>
     </div>
     <div class="col-md-3 col-6">
-        <div class="card-custom bg-warning bg-opacity-10 text-warning border-warning text-center py-3">
-            <h3 class="fw-bold mb-0">{{ $summary['terlambat'] ?? 0 }}</h3>
+        <div class="card-custom bg-warning bg-opacity-10 text-warning border-warning text-center py-3 shadow-sm hover-shadow" style="transition: all 0.3s ease;">
+            <h3 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>{{ $summary['terlambat'] ?? 0 }}</h3>
             <div class="small fw-semibold mt-1">Total Terlambat</div>
         </div>
     </div>
     <div class="col-md-3 col-6">
-        <div class="card-custom bg-primary bg-opacity-10 text-primary border-primary text-center py-3">
-            <h3 class="fw-bold mb-0">{{ ($summary['izin'] ?? 0) + ($summary['sakit'] ?? 0) }}</h3>
+        <div class="card-custom bg-primary bg-opacity-10 text-primary border-primary text-center py-3 shadow-sm hover-shadow" style="transition: all 0.3s ease;">
+            <h3 class="fw-bold mb-0"><i class="bi bi-envelope-paper me-2"></i>{{ ($summary['izin'] ?? 0) + ($summary['sakit'] ?? 0) }}</h3>
             <div class="small fw-semibold mt-1">Total Izin/Sakit</div>
         </div>
     </div>
     <div class="col-md-3 col-6">
-        <div class="card-custom bg-danger bg-opacity-10 text-danger border-danger text-center py-3">
-            <h3 class="fw-bold mb-0">{{ $summary['alfa'] ?? 0 }}</h3>
+        <div class="card-custom bg-danger bg-opacity-10 text-danger border-danger text-center py-3 shadow-sm hover-shadow" style="transition: all 0.3s ease;">
+            <h3 class="fw-bold mb-0"><i class="bi bi-x-circle me-2"></i>{{ $summary['alfa'] ?? 0 }}</h3>
             <div class="small fw-semibold mt-1">Total Alfa</div>
         </div>
     </div>

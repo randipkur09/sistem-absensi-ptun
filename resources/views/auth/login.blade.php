@@ -41,6 +41,10 @@
             max-width: 440px;
             padding: 1rem;
         }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .login-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -48,23 +52,38 @@
             border-radius: 24px;
             padding: 2.5rem;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s ease forwards;
         }
         .login-brand {
             text-align: center;
             margin-bottom: 2rem;
         }
         .login-brand .brand-icon {
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            border-radius: 18px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1rem;
-            font-size: 1.8rem;
             color: #fff;
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.35);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            animation: pulse-glow 3s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+        .login-brand .brand-icon svg {
+            width: 38px;
+            height: 38px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         .login-brand h3 {
             color: #f1f5f9;
@@ -149,7 +168,18 @@
         <div class="login-card">
             <div class="login-brand">
                 <div class="brand-icon">
-                    <i class="bi bi-building-check"></i>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 21h18"></path>
+                        <path d="M5 21v-4"></path>
+                        <path d="M19 21v-4"></path>
+                        <path d="M6 7l6-4 6 4"></path>
+                        <path d="M5 11h14"></path>
+                        <path d="M6 11v6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                        <path d="M18 11v6"></path>
+                        <path d="M12 7v4"></path>
+                    </svg>
                 </div>
                 <h3>PTUN Bandar Lampung</h3>
                 <p>Sistem Absensi Digital</p>

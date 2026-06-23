@@ -9,8 +9,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize
+class AttendanceExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize, WithCustomValueBinder
 {
     protected $startDate;
     protected $endDate;
@@ -21,6 +25,24 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->userId = $userId;
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value)) {
+            // Jam Masuk / Jam Pulang format (e.g., "08:21:20")
+            if (preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $value)) {
+                $cell->setValueExplicit($value, DataType::TYPE_STRING);
+                return true;
+            }
+            // Tanggal format (e.g., "22/06/2026")
+            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
+                $cell->setValueExplicit($value, DataType::TYPE_STRING);
+                return true;
+            }
+        }
+
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()
@@ -60,7 +82,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             $no,
             $attendance->user->name ?? '-',
             ucfirst($attendance->user->employee_type ?? '-'),
-            $attendance->tanggal->format('d/m/Y'),
+            $attendance->tanggal ? $attendance->tanggal->format('d/m/Y') : '-',
             $attendance->jam_masuk ?? '-',
             $attendance->jam_pulang ?? '-',
             ucfirst($attendance->status),

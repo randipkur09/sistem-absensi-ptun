@@ -78,17 +78,29 @@
         }
 
         .sidebar-brand .brand-icon {
-            width: 45px;
-            height: 45px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 0.75rem;
-            font-size: 1.4rem;
             color: #fff;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand .brand-icon:hover {
+            transform: scale(1.05);
+        }
+        .sidebar-brand .brand-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .sidebar-nav {
@@ -184,7 +196,8 @@
 
         /* ─── Topbar ─────────────────────────────────────── */
         .topbar {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             padding: 0.75rem 1.5rem;
             display: flex;
             align-items: center;
@@ -193,7 +206,7 @@
             position: sticky;
             top: 0;
             z-index: 999;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .topbar .page-title {
@@ -496,14 +509,19 @@
 
         /* ─── Animations ─────────────────────────────────── */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes slide-in {
+            from { transform: translateX(-15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .animate-fade-in {
@@ -542,7 +560,18 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon">
-                <i class="bi bi-building-check"></i>
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 21h18"></path>
+                    <path d="M5 21v-4"></path>
+                    <path d="M19 21v-4"></path>
+                    <path d="M6 7l6-4 6 4"></path>
+                    <path d="M5 11h14"></path>
+                    <path d="M6 11v6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                    <path d="M18 11v6"></path>
+                    <path d="M12 7v4"></path>
+                </svg>
             </div>
             <h4>PTUN Bandar Lampung</h4>
             <small>Sistem Absensi Digital</small>
@@ -554,8 +583,9 @@
 
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="user-avatar">
+                <div class="user-avatar position-relative">
                     {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle" style="animation: pulse-glow 2s infinite;"></span>
                 </div>
                 <div>
                     <div class="user-name">{{ auth()->user()->name ?? 'User' }}</div>
@@ -582,10 +612,14 @@
                 <span class="page-title">@yield('page-title', 'Dashboard')</span>
             </div>
             <div class="topbar-actions">
-                <span style="font-size: 0.8rem; color: #64748b;">
-                    <i class="bi bi-calendar3 me-1"></i>
+                <span class="badge bg-light text-dark px-3 py-2 border rounded-pill d-flex align-items-center" style="font-size: 0.8rem;">
+                    <i class="bi bi-calendar3 text-primary me-2"></i>
                     {{ now()->translatedFormat('l, d F Y') }}
                 </span>
+                <button class="btn btn-light position-relative rounded-circle ms-2" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-bell text-muted"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                </button>
             </div>
         </header>
 
