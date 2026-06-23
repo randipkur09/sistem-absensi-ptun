@@ -6,7 +6,7 @@
 @section('content')
 <div class="row mb-4 animate-fade-in">
     <div class="col-12">
-        <h4 class="fw-bold" style="color: #0f172a;">
+        <h4 class="fw-bold" style="color: var(--text-primary);">
             @php
                 $hour = now()->format('H');
                 if ($hour < 12) $greeting = 'Selamat Pagi';
@@ -14,7 +14,7 @@
                 elseif ($hour < 18) $greeting = 'Selamat Sore';
                 else $greeting = 'Selamat Malam';
             @endphp
-            {{ $greeting }}, {{ auth()->user()->name ?? 'Admin' }}! 👋
+            {{ $greeting }}, {{ auth()->user()->name ?? 'Admin' }}
         </h4>
         <p class="text-muted mb-0">Berikut adalah ringkasan sistem absensi hari ini.</p>
     </div>
@@ -73,31 +73,31 @@
     <div class="col-12">
         <div class="card-custom">
             <div class="card-header">
-                <span><i class="bi bi-calendar-check me-2"></i> Absensi Hari Ini</span>
-                <span class="badge bg-light text-dark">{{ now()->translatedFormat('d F Y') }}</span>
+                <span><i class="bi bi-calendar-check me-2"></i>Absensi Hari Ini</span>
+                <span class="badge bg-light text-dark" style="font-size: 0.75rem;">{{ now()->translatedFormat('d F Y') }}</span>
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3 col-6">
-                        <div class="text-center p-3 rounded-3" style="background: #dcfce7;">
+                        <div class="text-center p-3 rounded-3" style="background: #f0fdf4;">
                             <div style="font-size: 2rem; font-weight: 800; color: #166534;">{{ $hadirToday }}</div>
                             <div style="font-size: 0.8rem; color: #166534; font-weight: 600;">Hadir</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-center p-3 rounded-3" style="background: #fef3c7;">
+                        <div class="text-center p-3 rounded-3" style="background: #fffbeb;">
                             <div style="font-size: 2rem; font-weight: 800; color: #92400e;">{{ $terlambatToday }}</div>
                             <div style="font-size: 0.8rem; color: #92400e; font-weight: 600;">Terlambat</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-center p-3 rounded-3" style="background: #dbeafe;">
+                        <div class="text-center p-3 rounded-3" style="background: #eff6ff;">
                             <div style="font-size: 2rem; font-weight: 800; color: #1e40af;">{{ $izinToday }}</div>
                             <div style="font-size: 0.8rem; color: #1e40af; font-weight: 600;">Izin</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="text-center p-3 rounded-3" style="background: #fce7f3;">
+                        <div class="text-center p-3 rounded-3" style="background: #fdf2f8;">
                             <div style="font-size: 2rem; font-weight: 800; color: #9d174d;">{{ $sakitToday }}</div>
                             <div style="font-size: 0.8rem; color: #9d174d; font-weight: 600;">Sakit</div>
                         </div>
@@ -113,7 +113,7 @@
     <div class="col-lg-4">
         <div class="card-custom">
             <div class="card-header">
-                <span><i class="bi bi-bar-chart-fill me-2"></i> Rekap Bulan Ini</span>
+                <span><i class="bi bi-bar-chart-fill me-2"></i>Rekap Bulan Ini</span>
             </div>
             <div class="card-body">
                 <canvas id="monthlyChart" height="220"></canvas>
@@ -123,7 +123,7 @@
     <div class="col-lg-8">
         <div class="card-custom">
             <div class="card-header">
-                <span><i class="bi bi-clock-history me-2"></i> Absensi Terbaru</span>
+                <span><i class="bi bi-clock-history me-2"></i>Absensi Terbaru</span>
                 <a href="{{ route('admin.attendance.index') }}" class="btn btn-sm btn-outline-custom">Lihat Semua</a>
             </div>
             <div class="card-body p-0">
@@ -180,7 +180,7 @@
                     monthlyData['sakit'] || 0,
                     monthlyData['alfa'] || 0,
                 ],
-                backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#ef4444'],
+                backgroundColor: ['#16a34a', '#d97706', '#2563eb', '#db2777', '#dc2626'],
                 borderWidth: 0,
                 hoverOffset: 8,
             }]
@@ -195,7 +195,7 @@
                         padding: 15,
                         usePointStyle: true,
                         pointStyleWidth: 10,
-                        font: { size: 12, family: 'Inter' }
+                        font: { size: 12, family: 'Plus Jakarta Sans' }
                     }
                 }
             }

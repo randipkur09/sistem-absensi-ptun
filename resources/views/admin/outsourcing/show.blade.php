@@ -12,7 +12,7 @@
                     @if($outsourcing->photo)
                         <img src="{{ asset('storage/' . $outsourcing->photo) }}" alt="Profile" class="rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #fff;">
                     @else
-                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center shadow" style="width: 150px; height: 150px; font-size: 4rem; font-weight: 700; border: 4px solid #fff;">
+                        <div class="rounded-circle text-white d-inline-flex align-items-center justify-content-center shadow" style="width: 150px; height: 150px; font-size: 4rem; font-weight: 700; border: 4px solid #fff; background: linear-gradient(135deg, var(--primary), var(--primary-light));">
                             {{ strtoupper(substr($outsourcing->name, 0, 1)) }}
                         </div>
                     @endif

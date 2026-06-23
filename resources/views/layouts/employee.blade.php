@@ -21,7 +21,7 @@
             $myPending = \App\Models\Permission::where('user_id', auth()->id())->where('status_approval', 'pending')->count();
         @endphp
         @if($myPending > 0)
-            <span class="badge bg-warning text-dark rounded-pill ms-auto" style="font-size: 0.6rem;">{{ $myPending }} Proses</span>
+            <span class="badge rounded-pill ms-auto" style="background: var(--secondary); color: #1a1a1a; font-size: 0.6rem; font-weight: 700;">{{ $myPending }} Proses</span>
         @endif
     </a>
 @endsection

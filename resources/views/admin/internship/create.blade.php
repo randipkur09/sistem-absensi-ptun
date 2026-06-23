@@ -15,7 +15,7 @@
                 <form action="{{ route('admin.internship.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     
-                    <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">Informasi Akun Utama</h6>
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: var(--primary);">Informasi Akun Utama</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
@@ -47,7 +47,7 @@
                         </div>
                     </div>
 
-                    <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">Informasi Kampus & Periode Magang</h6>
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: var(--primary);">Informasi Kampus & Periode Magang</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Nama Institusi / Universitas <span class="text-danger">*</span></label>

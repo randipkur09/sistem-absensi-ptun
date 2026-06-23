@@ -42,7 +42,7 @@
             @if($attendance->user->photo)
                 <img src="{{ asset('storage/' . $attendance->user->photo) }}" alt="Foto" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
             @else
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, var(--primary), var(--primary-light));">
                     {{ strtoupper(substr($attendance->user->name, 0, 1)) }}
                 </div>
             @endif
@@ -60,7 +60,7 @@
     <!-- Absen Masuk -->
     <div class="col-md-6">
         <div class="card-custom h-100">
-            <div class="card-header bg-success text-white">
+            <div class="card-header text-white" style="background: var(--success);">
                 <span><i class="bi bi-box-arrow-in-right me-2"></i> Data Absen Masuk</span>
             </div>
             <div class="card-body">
@@ -100,7 +100,7 @@
     <!-- Absen Pulang -->
     <div class="col-md-6">
         <div class="card-custom h-100">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header text-white" style="background: var(--primary);">
                 <span><i class="bi bi-box-arrow-right me-2"></i> Data Absen Pulang</span>
             </div>
             <div class="card-body">
@@ -157,7 +157,7 @@
         // Office Marker
         L.marker([officeLat, officeLng]).addTo(map).bindPopup('Lokasi Kantor');
         L.circle([officeLat, officeLng], {
-            color: 'blue', fillColor: '#3b82f6', fillOpacity: 0.1, radius: maxRadius
+            color: '#1a5632', fillColor: '#1a5632', fillOpacity: 0.1, radius: maxRadius
         }).addTo(map);
 
         // User Marker

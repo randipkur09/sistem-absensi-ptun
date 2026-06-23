@@ -24,7 +24,7 @@
             $pendingCount = \App\Models\Permission::where('status_approval', 'pending')->count();
         @endphp
         @if($pendingCount > 0)
-            <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.6rem; animation: pulse-glow 2s infinite;">{{ $pendingCount }}</span>
+            <span class="badge rounded-pill ms-auto" style="background: var(--secondary); color: #1a1a1a; font-size: 0.6rem; font-weight: 700;">{{ $pendingCount }}</span>
         @endif
     </a>
     <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">

@@ -49,7 +49,7 @@
                         </div>
                         
                         <div class="col-12 mt-4">
-                            <label class="form-label fw-bold text-primary">Preview & Atur Titik Lokasi (Geser Marker)</label>
+                            <label class="form-label fw-bold" style="color: var(--primary);">Preview & Atur Titik Lokasi (Geser Marker)</label>
                             <div id="map-preview"></div>
                         </div>
                     </div>
@@ -113,8 +113,8 @@
     }).addTo(map);
 
     const circle = L.circle([currentLat, currentLng], {
-        color: 'blue',
-        fillColor: '#3b82f6',
+        color: '#1a5632',
+        fillColor: '#1a5632',
         fillOpacity: 0.2,
         radius: currentRadius
     }).addTo(map);

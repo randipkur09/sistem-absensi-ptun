@@ -49,11 +49,11 @@
     .btn-capture:hover { background: rgba(255, 255, 255, 0.6); transform: scale(1.05); }
     .btn-retake { display: none; }
     .info-box {
-        background: #f8fafc;
+        background: #f8faf8;
         border-radius: 12px;
         padding: 1rem;
         margin-bottom: 1rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border-color);
     }
 </style>
 @endpush
@@ -69,7 +69,7 @@
             <div class="card-body p-4">
                 @if($todayAttendance && $todayAttendance->jam_masuk && $todayAttendance->jam_pulang)
                     <div class="text-center py-5">
-                        <div class="display-1 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>
+                        <div class="display-1 mb-3" style="color: var(--success);"><i class="bi bi-check-circle-fill"></i></div>
                         <h4>Absensi Selesai</h4>
                         <p class="text-muted">Anda sudah melakukan absensi masuk dan pulang hari ini.</p>
                     </div>
@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                             <div class="text-center mt-2 small text-muted">
-                                <i class="bi bi-info-circle me-1"></i> Pastikan wajah terlihat jelas.
+                                <i class="bi bi-info-circle me-1"></i>Pastikan wajah terlihat jelas.
                             </div>
                         </div>
 
@@ -117,11 +117,11 @@
                                 
                                 @if(!$todayAttendance || !$todayAttendance->jam_masuk)
                                     <button type="button" id="btn-submit-masuk" class="btn btn-primary-custom w-100 py-2 mb-2" disabled>
-                                        <i class="bi bi-box-arrow-in-right me-2"></i> Absen Masuk
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Absen Masuk
                                     </button>
                                 @elseif(!$todayAttendance->jam_pulang)
                                     <button type="button" id="btn-submit-pulang" class="btn btn-success-custom w-100 py-2 mb-2" disabled>
-                                        <i class="bi bi-box-arrow-right me-2"></i> Absen Pulang
+                                        <i class="bi bi-box-arrow-right me-2"></i>Absen Pulang
                                     </button>
                                 @endif
                             </form>
@@ -151,7 +151,7 @@
     updateClock();
 
     @if(!($todayAttendance && $todayAttendance->jam_masuk && $todayAttendance->jam_pulang))
-        // ─── Camera Logic ────────────────────────────────────
+        // --- Camera Logic ---
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const photoPreview = document.getElementById('photo-preview');
@@ -166,7 +166,7 @@
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
                 video.srcObject = stream;
             } catch (err) {
-                Swal.fire('Error Camera', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
+                Swal.fire('Kamera Tidak Tersedia', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
             }
         }
 
@@ -201,7 +201,7 @@
             checkSubmitStatus();
         });
 
-        // ─── GPS & Map Logic ─────────────────────────────────
+        // --- GPS & Map Logic ---
         const map = L.map('map').setView([officeLat, officeLng], 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
@@ -210,7 +210,7 @@
         // Office marker & circle
         L.marker([officeLat, officeLng]).addTo(map).bindPopup('Lokasi Kantor').openPopup();
         L.circle([officeLat, officeLng], {
-            color: 'blue', fillColor: '#3b82f6', fillOpacity: 0.2, radius: maxRadius
+            color: '#1a5632', fillColor: '#1a5632', fillOpacity: 0.15, radius: maxRadius
         }).addTo(map);
 
         let userMarker = null;
@@ -220,15 +220,15 @@
 
         // Haversine formula
         function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // metres
-            const φ1 = lat1 * Math.PI/180;
-            const φ2 = lat2 * Math.PI/180;
-            const Δφ = (lat2-lat1) * Math.PI/180;
-            const Δλ = (lon2-lon1) * Math.PI/180;
+            const R = 6371e3;
+            const p1 = lat1 * Math.PI/180;
+            const p2 = lat2 * Math.PI/180;
+            const dp = (lat2-lat1) * Math.PI/180;
+            const dl = (lon2-lon1) * Math.PI/180;
 
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                    Math.cos(φ1) * Math.cos(φ2) *
-                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const a = Math.sin(dp/2) * Math.sin(dp/2) +
+                    Math.cos(p1) * Math.cos(p2) *
+                    Math.sin(dl/2) * Math.sin(dl/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
             return R * c;
@@ -238,7 +238,6 @@
             navigator.geolocation.watchPosition((position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                const accuracy = position.coords.accuracy;
 
                 inputLat.value = lat;
                 inputLng.value = lng;
@@ -291,7 +290,7 @@
             Swal.fire('Error GPS', 'Browser Anda tidak mendukung Geolocation', 'error');
         }
 
-        // ─── Submit Logic ────────────────────────────────────
+        // --- Submit Logic ---
         const btnMasuk = document.getElementById('btn-submit-masuk');
         const btnPulang = document.getElementById('btn-submit-pulang');
 

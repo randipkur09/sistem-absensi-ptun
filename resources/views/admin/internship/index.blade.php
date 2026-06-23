@@ -8,8 +8,8 @@
     <div class="card-header border-bottom">
         <div class="d-flex justify-content-between align-items-center w-100">
             <span>
-                <i class="bi bi-mortarboard-fill me-2 text-primary"></i> Data Peserta Magang
-                <span class="badge bg-primary bg-opacity-10 text-primary ms-2 rounded-pill">{{ $internships->total() }} Data</span>
+                <i class="bi bi-mortarboard-fill me-2" style="color: var(--primary);"></i> Data Peserta Magang
+                <span class="badge ms-2 rounded-pill" style="background: rgba(26,86,50,0.1); color: var(--primary);">{{ $internships->total() }} Data</span>
             </span>
             <div>
                 <button type="button" class="btn btn-sm btn-success-custom" data-bs-toggle="modal" data-bs-target="#importModal">
@@ -29,7 +29,7 @@
         <form action="{{ route('admin.internship.index') }}" method="GET" class="mb-3">
             <div class="input-group">
                 <input type="text" name="search" class="form-control" placeholder="Cari nama, email, institusi..." value="{{ request('search') }}">
-                <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Cari</button>
+                <button class="btn btn-primary-custom" type="submit"><i class="bi bi-search"></i> Cari</button>
                 @if(request('search'))
                     <a href="{{ route('admin.internship.index') }}" class="btn btn-outline-secondary">Reset</a>
                 @endif
@@ -56,10 +56,10 @@
                                 <img src="{{ asset('storage/' . $item->photo) }}" alt="Foto" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                             @else
                                 @php
-                                    $colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                                    $colors = ['#1a5632', '#2d7a4a', '#c5a237', '#16a34a', '#d97706', '#2563eb', '#9333ea'];
                                     $bgColor = $colors[strlen($item->name) % count($colors)];
                                 @endphp
-                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold; background: linear-gradient(135deg, {{ $bgColor }}, #1e293b);">
+                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: bold; background: linear-gradient(135deg, {{ $bgColor }}, #0d3320);">
                                     {{ strtoupper(substr($item->name, 0, 1)) }}
                                 </div>
                             @endif
