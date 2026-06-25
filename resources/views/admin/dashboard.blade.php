@@ -110,17 +110,7 @@
 
 <!-- Monthly Recap & Recent -->
 <div class="row g-3">
-    <div class="col-lg-4">
-        <div class="card-custom">
-            <div class="card-header">
-                <span><i class="bi bi-bar-chart-fill me-2"></i>Rekap Bulan Ini</span>
-            </div>
-            <div class="card-body">
-                <canvas id="monthlyChart" height="220"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-8">
+    <div class="col-12">
         <div class="card-custom">
             <div class="card-header">
                 <span><i class="bi bi-clock-history me-2"></i>Absensi Terbaru</span>
@@ -162,44 +152,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-    const monthlyData = @json($monthlyAttendances);
-    const ctx = document.getElementById('monthlyChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alfa'],
-            datasets: [{
-                data: [
-                    monthlyData['hadir'] || 0,
-                    monthlyData['terlambat'] || 0,
-                    monthlyData['izin'] || 0,
-                    monthlyData['sakit'] || 0,
-                    monthlyData['alfa'] || 0,
-                ],
-                backgroundColor: ['#16a34a', '#d97706', '#2563eb', '#db2777', '#dc2626'],
-                borderWidth: 0,
-                hoverOffset: 8,
-            }]
-        },
-        options: {
-            responsive: true,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyleWidth: 10,
-                        font: { size: 12, family: 'Plus Jakarta Sans' }
-                    }
-                }
-            }
-        }
-    });
-</script>
-@endpush

@@ -37,14 +37,6 @@ class DashboardController extends Controller
                         ->where('tanggal_selesai', '>=', $today)
                         ->count();
 
-        // Rekap bulanan
-        $monthlyAttendances = Attendance::whereMonth('tanggal', $currentMonth->month)
-            ->whereYear('tanggal', $currentMonth->year)
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
         // Daftar absensi terbaru
         $recentAttendances = Attendance::with('user')
             ->orderBy('created_at', 'desc')
@@ -62,7 +54,6 @@ class DashboardController extends Controller
             'terlambatToday',
             'izinToday',
             'sakitToday',
-            'monthlyAttendances',
             'recentAttendances',
             'pendingPermissions'
         ));
