@@ -51,8 +51,9 @@ class GenerateAlfa extends Command
         $today = Carbon::today();
         $count = 0;
 
-        // Ambil pegawai aktif
-        $employeesQuery = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+        // Ambil pegawai aktif beserta relasinya untuk cek tanggal kontrak/magang
+        $employeesQuery = User::with(['outsourcingEmployee', 'internshipParticipant'])
+            ->whereHas('role', fn($q) => $q->where('name', 'pegawai'))
             ->where('status', 'aktif');
 
         if ($userId) {
@@ -71,6 +72,32 @@ class GenerateAlfa extends Command
                 $tanggal = $current->toDateString();
 
                 foreach ($employees as $employee) {
+                    // Cek masa aktif pegawai berdasarkan tipe
+                    $isActiveOnDate = true;
+                    if ($employee->isOutsourcing() && $employee->outsourcingEmployee) {
+                        $startContract = $employee->outsourcingEmployee->contract_start;
+                        $endContract = $employee->outsourcingEmployee->contract_end;
+                        if ($startContract && $current->lt($startContract->copy()->startOfDay())) {
+                            $isActiveOnDate = false;
+                        }
+                        if ($endContract && $current->gt($endContract->copy()->endOfDay())) {
+                            $isActiveOnDate = false;
+                        }
+                    } elseif ($employee->isMagang() && $employee->internshipParticipant) {
+                        $startInternship = $employee->internshipParticipant->start_date;
+                        $endInternship = $employee->internshipParticipant->end_date;
+                        if ($startInternship && $current->lt($startInternship->copy()->startOfDay())) {
+                            $isActiveOnDate = false;
+                        }
+                        if ($endInternship && $current->gt($endInternship->copy()->endOfDay())) {
+                            $isActiveOnDate = false;
+                        }
+                    }
+
+                    if (!$isActiveOnDate) {
+                        continue;
+                    }
+
                     // Cek apakah sudah ada record absensi untuk pegawai ini di tanggal ini
                     $exists = Attendance::where('user_id', $employee->id)
                         ->where('tanggal', $tanggal)

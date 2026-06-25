@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Carbon\Carbon;
 
 class UserImport implements ToModel, WithHeadingRow, WithValidation
 {
@@ -40,8 +41,8 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
                 'user_id'         => $user->id,
                 'company_name'    => $row['perusahaan'] ?? '-',
                 'position'        => $row['jabatan'] ?? '-',
-                'contract_start'  => \Carbon\Carbon::parse($row['tanggal_mulai'] ?? now()),
-                'contract_end'    => \Carbon\Carbon::parse($row['tanggal_selesai'] ?? now()->addYear()),
+                'contract_start'  => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
+                'contract_end'    => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addYear()),
                 'contract_number' => $row['nomor_kontrak'] ?? null,
             ]);
         } else {
@@ -49,8 +50,8 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
                 'user_id'     => $user->id,
                 'institution' => $row['institusi'] ?? '-',
                 'major'       => $row['jurusan'] ?? '-',
-                'start_date'  => \Carbon\Carbon::parse($row['tanggal_mulai'] ?? now()),
-                'end_date'    => \Carbon\Carbon::parse($row['tanggal_selesai'] ?? now()->addMonths(6)),
+                'start_date'  => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
+                'end_date'    => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addMonths(6)),
                 'supervisor'  => $row['pembimbing'] ?? null,
             ]);
         }
@@ -64,5 +65,37 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
             'nama'  => 'required|string',
             'email' => 'required|email|unique:users,email',
         ];
+    }
+
+    /**
+     * Parse tanggal dari berbagai format Excel (dd/mm/yyyy, d/m/yyyy, yyyy-mm-dd, serial number).
+     */
+    protected function parseDate($value, $default = null): Carbon
+    {
+        if (empty($value)) {
+            return $default instanceof Carbon ? $default : Carbon::parse($default);
+        }
+
+        // Jika berupa angka (Excel serial number)
+        if (is_numeric($value)) {
+            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+        }
+
+        // Coba format dd/mm/yyyy atau d/m/yyyy
+        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d', 'Y/m/d', 'd/m/y', 'd-m-y'];
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $value);
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        // Fallback: coba Carbon::parse biasa
+        try {
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return $default instanceof Carbon ? $default : Carbon::parse($default);
+        }
     }
 }
