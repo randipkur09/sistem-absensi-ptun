@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Generate record alfa setiap hari jam 23:55 untuk pegawai yang tidak absen hari ini
+        $schedule->command('attendance:generate-alfa')->dailyAt('23:55');
     }
 
     /**

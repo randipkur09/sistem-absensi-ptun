@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\User;
 use App\Exports\AttendanceExport;
+use App\Console\Commands\GenerateAlfa;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,8 +16,6 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Attendance::with('user');
-
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->start_date)
             : Carbon::now()->startOfMonth();
@@ -25,22 +24,28 @@ class ReportController extends Controller
             ? Carbon::parse($request->end_date)
             : Carbon::now()->endOfMonth();
 
-        $query->whereBetween('tanggal', [$startDate, $endDate]);
+        $userId = $request->filled('user_id') ? $request->user_id : null;
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        // Generate record alfa otomatis untuk hari kerja yang belum ada absensi
+        GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
+
+        $query = Attendance::with('user')
+            ->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
         }
 
         $attendances = $query->orderBy('tanggal', 'desc')
             ->orderBy('jam_masuk', 'desc')
             ->paginate(20);
 
-        // Summary statistics
-        $allAttendances = Attendance::whereBetween('tanggal', [$startDate, $endDate]);
-        if ($request->filled('user_id')) {
-            $allAttendances->where('user_id', $request->user_id);
+        // Summary statistics — alfa sudah jadi record di database
+        $summaryQuery = Attendance::whereBetween('tanggal', [$startDate, $endDate]);
+        if ($userId) {
+            $summaryQuery->where('user_id', $userId);
         }
-        $summary = $allAttendances->selectRaw('status, COUNT(*) as total')
+        $summary = $summaryQuery->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
@@ -57,8 +62,6 @@ class ReportController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $query = Attendance::with('user');
-
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->start_date)
             : Carbon::now()->startOfMonth();
@@ -67,10 +70,16 @@ class ReportController extends Controller
             ? Carbon::parse($request->end_date)
             : Carbon::now()->endOfMonth();
 
-        $query->whereBetween('tanggal', [$startDate, $endDate]);
+        $userId = $request->filled('user_id') ? $request->user_id : null;
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        // Generate record alfa sebelum export
+        GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
+
+        $query = Attendance::with('user')
+            ->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
         }
 
         $attendances = $query->orderBy('tanggal', 'asc')->get();
@@ -93,7 +102,10 @@ class ReportController extends Controller
             ? Carbon::parse($request->end_date)
             : Carbon::now()->endOfMonth();
 
-        $userId = $request->user_id;
+        $userId = $request->filled('user_id') ? $request->user_id : null;
+
+        // Generate record alfa sebelum export
+        GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
 
         $filename = 'Laporan_Absensi_' . $startDate->format('d-m-Y') . '_sd_' . $endDate->format('d-m-Y') . '.xlsx';
 
