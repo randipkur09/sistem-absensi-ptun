@@ -362,7 +362,6 @@
                 <div class="brand-divider"></div>
                 <div class="brand-subtitle">Sistem Absensi Digital</div>
                 <p class="brand-quote">Mengelola kehadiran pegawai secara akurat, transparan, dan efisien dengan teknologi digital.</p>
-                <p class="brand-motto">"Dharma Mayukti"</p>
             </div>
         </div>
 
