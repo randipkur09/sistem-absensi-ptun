@@ -17,7 +17,15 @@
                         <label class="form-label">Sampai Tanggal</label>
                         <input type="date" class="form-control" name="end_date" id="end_date" value="{{ $endDate->format('Y-m-d') }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Tipe Pegawai</label>
+                        <select name="employee_type" id="employee_type" class="form-select">
+                            <option value="">Semua Tipe</option>
+                            <option value="outsourcing" {{ request('employee_type') == 'outsourcing' ? 'selected' : '' }}>Outsourcing</option>
+                            <option value="magang" {{ request('employee_type') == 'magang' ? 'selected' : '' }}>Magang</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label">Pilih Pegawai (Opsional)</label>
                         <select name="user_id" id="user_id" class="form-select">
                             <option value="">Semua Pegawai</option>
@@ -117,10 +125,11 @@
     function exportReport(type) {
         const startDate = document.getElementById('start_date').value;
         const endDate = document.getElementById('end_date').value;
+        const employeeType = document.getElementById('employee_type').value;
         const userId = document.getElementById('user_id').value;
         
         let url = type === 'pdf' ? '{{ route("admin.reports.export-pdf") }}' : '{{ route("admin.reports.export-excel") }}';
-        url += `?start_date=${startDate}&end_date=${endDate}&user_id=${userId}`;
+        url += `?start_date=${startDate}&end_date=${endDate}&employee_type=${employeeType}&user_id=${userId}`;
         
         window.open(url, '_blank');
     }

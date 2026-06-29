@@ -19,12 +19,14 @@ class AttendanceExport extends DefaultValueBinder implements FromCollection, Wit
     protected $startDate;
     protected $endDate;
     protected $userId;
+    protected $employeeType;
 
-    public function __construct($startDate, $endDate, $userId = null)
+    public function __construct($startDate, $endDate, $userId = null, $employeeType = null)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->userId = $userId;
+        $this->employeeType = $employeeType;
     }
 
     public function bindValue(Cell $cell, $value)
@@ -52,6 +54,10 @@ class AttendanceExport extends DefaultValueBinder implements FromCollection, Wit
 
         if ($this->userId) {
             $query->where('user_id', $this->userId);
+        } elseif ($this->employeeType) {
+            $query->whereHas('user', function($q) {
+                $q->where('employee_type', $this->employeeType);
+            });
         }
 
         return $query->orderBy('tanggal', 'asc')->get();

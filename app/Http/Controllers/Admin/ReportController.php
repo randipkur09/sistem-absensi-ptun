@@ -25,6 +25,7 @@ class ReportController extends Controller
             : Carbon::now()->endOfMonth();
 
         $userId = $request->filled('user_id') ? $request->user_id : null;
+        $employeeType = $request->filled('employee_type') ? $request->employee_type : null;
 
         // Generate record alfa otomatis untuk hari kerja yang belum ada absensi
         GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
@@ -34,6 +35,10 @@ class ReportController extends Controller
 
         if ($userId) {
             $query->where('user_id', $userId);
+        } elseif ($employeeType) {
+            $query->whereHas('user', function($q) use ($employeeType) {
+                $q->where('employee_type', $employeeType);
+            });
         }
 
         $attendances = $query->orderBy('tanggal', 'desc')
@@ -44,16 +49,24 @@ class ReportController extends Controller
         $summaryQuery = Attendance::whereBetween('tanggal', [$startDate, $endDate]);
         if ($userId) {
             $summaryQuery->where('user_id', $userId);
+        } elseif ($employeeType) {
+            $summaryQuery->whereHas('user', function($q) use ($employeeType) {
+                $q->where('employee_type', $employeeType);
+            });
         }
         $summary = $summaryQuery->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        $users = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
-            ->where('status', 'aktif')
-            ->orderBy('name')
-            ->get();
+        $usersQuery = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+            ->where('status', 'aktif');
+            
+        if ($employeeType) {
+            $usersQuery->where('employee_type', $employeeType);
+        }
+        
+        $users = $usersQuery->orderBy('name')->get();
 
         return view('admin.reports.index', compact(
             'attendances', 'users', 'startDate', 'endDate', 'summary'
@@ -71,6 +84,7 @@ class ReportController extends Controller
             : Carbon::now()->endOfMonth();
 
         $userId = $request->filled('user_id') ? $request->user_id : null;
+        $employeeType = $request->filled('employee_type') ? $request->employee_type : null;
 
         // Generate record alfa sebelum export
         GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
@@ -80,6 +94,10 @@ class ReportController extends Controller
 
         if ($userId) {
             $query->where('user_id', $userId);
+        } elseif ($employeeType) {
+            $query->whereHas('user', function($q) use ($employeeType) {
+                $q->where('employee_type', $employeeType);
+            });
         }
 
         $attendances = $query->orderBy('tanggal', 'asc')->get();
@@ -103,12 +121,13 @@ class ReportController extends Controller
             : Carbon::now()->endOfMonth();
 
         $userId = $request->filled('user_id') ? $request->user_id : null;
+        $employeeType = $request->filled('employee_type') ? $request->employee_type : null;
 
         // Generate record alfa sebelum export
         GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
 
         $filename = 'Laporan_Absensi_' . $startDate->format('d-m-Y') . '_sd_' . $endDate->format('d-m-Y') . '.xlsx';
 
-        return Excel::download(new AttendanceExport($startDate, $endDate, $userId), $filename);
+        return Excel::download(new AttendanceExport($startDate, $endDate, $userId, $employeeType), $filename);
     }
 }
