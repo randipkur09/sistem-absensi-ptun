@@ -97,49 +97,7 @@
                         </td>
                     </tr>
 
-                    {{-- Modal Edit Shift --}}
-                    <div class="modal fade" id="editShiftModal{{ $shift->id }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Edit Shift: {{ $shift->name }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form action="{{ route('admin.shifts.update', $shift->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama Shift</label>
-                                            <input type="text" class="form-control" name="name" value="{{ $shift->name }}" required>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-6">
-                                                <label class="form-label">Jam Masuk (Mulai)</label>
-                                                <input type="time" class="form-control" name="jam_masuk_start" value="{{ \Carbon\Carbon::parse($shift->jam_masuk_start)->format('H:i') }}" required>
-                                            </div>
-                                            <div class="col-6">
-                                                <label class="form-label">Jam Masuk (Selesai)</label>
-                                                <input type="time" class="form-control" name="jam_masuk_end" value="{{ \Carbon\Carbon::parse($shift->jam_masuk_end)->format('H:i') }}" required>
-                                            </div>
-                                            <div class="col-6">
-                                                <label class="form-label">Batas Terlambat</label>
-                                                <input type="time" class="form-control" name="batas_terlambat" value="{{ \Carbon\Carbon::parse($shift->batas_terlambat)->format('H:i') }}" required>
-                                            </div>
-                                            <div class="col-6">
-                                                <label class="form-label">Jam Pulang</label>
-                                                <input type="time" class="form-control" name="jam_pulang" value="{{ \Carbon\Carbon::parse($shift->jam_pulang)->format('H:i') }}" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-primary-custom">Simpan</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+
                     @empty
                     <tr>
                         <td colspan="7" class="text-center py-4 text-muted">Belum ada data shift. Silakan tambah shift terlebih dahulu.</td>
@@ -150,6 +108,52 @@
         </div>
     </div>
 </div>
+
+{{-- Modals for Edit Shift (moved outside of table) --}}
+@foreach($shifts as $shift)
+<div class="modal fade" id="editShiftModal{{ $shift->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Shift: {{ $shift->name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('admin.shifts.update', $shift->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Shift</label>
+                        <input type="text" class="form-control" name="name" value="{{ $shift->name }}" required>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">Jam Masuk (Mulai)</label>
+                            <input type="time" class="form-control" name="jam_masuk_start" value="{{ \Carbon\Carbon::parse($shift->jam_masuk_start)->format('H:i') }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Jam Masuk (Selesai)</label>
+                            <input type="time" class="form-control" name="jam_masuk_end" value="{{ \Carbon\Carbon::parse($shift->jam_masuk_end)->format('H:i') }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Batas Terlambat</label>
+                            <input type="time" class="form-control" name="batas_terlambat" value="{{ \Carbon\Carbon::parse($shift->batas_terlambat)->format('H:i') }}" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Jam Pulang</label>
+                            <input type="time" class="form-control" name="jam_pulang" value="{{ \Carbon\Carbon::parse($shift->jam_pulang)->format('H:i') }}" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary-custom">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
 
 {{-- Jadwal Shift Mingguan --}}
 <div class="card-custom animate-fade-in" style="animation-delay: 0.1s;">
