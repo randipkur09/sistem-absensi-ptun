@@ -34,7 +34,7 @@ class UserExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
         return [
             'No',
             'Nama',
-            'Email',
+            'Username',
             'Tipe',
             'Telepon',
             'Alamat',
@@ -71,7 +71,7 @@ class UserExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
         return [
             $no,
             $user->name,
-            $user->email,
+            $user->username,
             ucfirst($user->employee_type ?? '-'),
             $user->phone ?? '-',
             $user->address ?? '-',

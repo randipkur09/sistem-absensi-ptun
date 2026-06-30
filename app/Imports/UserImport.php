@@ -28,7 +28,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
 
         $user = User::create([
             'name' => $row['nama'],
-            'email' => $row['email'],
+            'username' => $row['username'],
             'password' => Hash::make($row['password'] ?? 'password123'),
             'role_id' => $pegawaiRole->id,
             'employee_type' => $this->type,
@@ -64,7 +64,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
     {
         return [
             'nama' => 'required|string',
-            'email' => 'required|email|unique:users,email',
+            'username' => 'required|string|unique:users,username',
         ];
     }
 
