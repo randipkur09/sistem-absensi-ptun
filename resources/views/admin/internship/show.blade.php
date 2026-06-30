@@ -19,7 +19,7 @@
                 </div>
                 
                 <h4 class="fw-bold mb-1">{{ $internship->name }}</h4>
-                <div class="text-muted mb-3">{{ $internship->email }}</div>
+                <div class="text-muted mb-3">{{ $internship->username }}</div>
                 
                 <span class="badge-status badge-{{ $internship->status }} mb-4 px-3 py-2 fs-6">
                     <i class="bi bi-person-circle me-1"></i> Akun {{ ucfirst($internship->status) }}

@@ -28,7 +28,7 @@
     <div class="card-body p-3">
         <form action="{{ route('admin.internship.index') }}" method="GET" class="mb-3">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari nama, email, institusi..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama, username, institusi..." value="{{ request('search') }}">
                 <button class="btn btn-primary-custom" type="submit"><i class="bi bi-search"></i> Cari</button>
                 @if(request('search'))
                     <a href="{{ route('admin.internship.index') }}" class="btn btn-outline-secondary">Reset</a>
@@ -66,7 +66,7 @@
                         </td>
                         <td>
                             <div class="fw-bold">{{ $item->name }}</div>
-                            <div class="small text-muted">{{ $item->email }}</div>
+                            <div class="small text-muted">{{ $item->username }}</div>
                             <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ $item->phone ?? '-' }}</div>
                         </td>
                         <td>
@@ -130,7 +130,7 @@
                         <input type="file" class="form-control" name="file" required accept=".xlsx,.xls,.csv">
                     </div>
                     <div class="alert alert-info py-2 small mb-0">
-                        Pastikan format kolom sesuai: nama, email, password, telepon, alamat, institusi, jurusan, tanggal_mulai, tanggal_selesai, pembimbing.
+                        Pastikan format kolom sesuai: nama, username, password, telepon, alamat, institusi, jurusan, tanggal_mulai, tanggal_selesai, pembimbing.
                     </div>
                 </div>
                 <div class="modal-footer">

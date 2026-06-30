@@ -16,7 +16,7 @@ class UpdateInternshipRequest extends FormRequest
         $userId = $this->route('internship')->id ?? $this->route('internship');
         return [
             'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email,' . $userId,
+            'username'       => 'required|string|unique:users,username,' . $userId,
             'password'    => 'nullable|string|min:6|confirmed',
             'phone'       => 'nullable|string|max:20',
             'address'     => 'nullable|string',

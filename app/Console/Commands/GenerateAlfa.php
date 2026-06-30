@@ -52,7 +52,9 @@ class GenerateAlfa extends Command
         $count = 0;
 
         // Ambil pegawai aktif beserta relasinya untuk cek tanggal kontrak/magang
-        $employeesQuery = User::with(['outsourcingEmployee', 'internshipParticipant'])
+        $employeesQuery = User::with(['outsourcingEmployee', 'internshipParticipant', 'shiftSchedules' => function($q) use ($startDate, $endDate) {
+            $q->whereBetween('tanggal', [$startDate, $endDate]);
+        }])
             ->whereHas('role', fn($q) => $q->where('name', 'pegawai'))
             ->where('status', 'aktif');
 
@@ -67,51 +69,64 @@ class GenerateAlfa extends Command
         $end = $endDate->copy()->endOfDay();
 
         while ($current->lte($end) && $current->lt($today)) {
-            // Skip weekend (Sabtu & Minggu)
-            if (!$current->isWeekend()) {
-                $tanggal = $current->toDateString();
+            $tanggal = $current->toDateString();
+            $isWeekend = $current->isWeekend();
 
-                foreach ($employees as $employee) {
-                    // Cek masa aktif pegawai berdasarkan tipe
-                    $isActiveOnDate = true;
-                    if ($employee->isOutsourcing() && $employee->outsourcingEmployee) {
-                        $startContract = $employee->outsourcingEmployee->contract_start;
-                        $endContract = $employee->outsourcingEmployee->contract_end;
-                        if ($startContract && $current->lt($startContract->copy()->startOfDay())) {
-                            $isActiveOnDate = false;
-                        }
-                        if ($endContract && $current->gt($endContract->copy()->endOfDay())) {
-                            $isActiveOnDate = false;
-                        }
-                    } elseif ($employee->isMagang() && $employee->internshipParticipant) {
-                        $startInternship = $employee->internshipParticipant->start_date;
-                        $endInternship = $employee->internshipParticipant->end_date;
-                        if ($startInternship && $current->lt($startInternship->copy()->startOfDay())) {
-                            $isActiveOnDate = false;
-                        }
-                        if ($endInternship && $current->gt($endInternship->copy()->endOfDay())) {
-                            $isActiveOnDate = false;
-                        }
+            foreach ($employees as $employee) {
+                $isSatpam = $employee->isSatpam();
+                
+                // Jika bukan satpam dan hari ini weekend, skip
+                if (!$isSatpam && $isWeekend) {
+                    continue;
+                }
+
+                // Cek masa aktif pegawai berdasarkan tipe
+                $isActiveOnDate = true;
+                if ($employee->isOutsourcing() && $employee->outsourcingEmployee) {
+                    $startContract = $employee->outsourcingEmployee->contract_start;
+                    $endContract = $employee->outsourcingEmployee->contract_end;
+                    if ($startContract && $current->lt($startContract->copy()->startOfDay())) {
+                        $isActiveOnDate = false;
                     }
-
-                    if (!$isActiveOnDate) {
-                        continue;
+                    if ($endContract && $current->gt($endContract->copy()->endOfDay())) {
+                        $isActiveOnDate = false;
                     }
-
-                    // Cek apakah sudah ada record absensi untuk pegawai ini di tanggal ini
-                    $exists = Attendance::where('user_id', $employee->id)
-                        ->where('tanggal', $tanggal)
-                        ->exists();
-
-                    if (!$exists) {
-                        Attendance::create([
-                            'user_id'    => $employee->id,
-                            'tanggal'    => $tanggal,
-                            'status'     => 'alfa',
-                            'keterangan' => 'Tidak hadir tanpa keterangan',
-                        ]);
-                        $count++;
+                } elseif ($employee->isMagang() && $employee->internshipParticipant) {
+                    $startInternship = $employee->internshipParticipant->start_date;
+                    $endInternship = $employee->internshipParticipant->end_date;
+                    if ($startInternship && $current->lt($startInternship->copy()->startOfDay())) {
+                        $isActiveOnDate = false;
                     }
+                    if ($endInternship && $current->gt($endInternship->copy()->endOfDay())) {
+                        $isActiveOnDate = false;
+                    }
+                }
+
+                if (!$isActiveOnDate) {
+                    continue;
+                }
+
+                // Jika Satpam, pastikan dia punya jadwal shift di hari ini
+                if ($isSatpam) {
+                    $hasSchedule = $employee->shiftSchedules->contains('tanggal', $current->copy()->startOfDay());
+                    if (!$hasSchedule) {
+                        continue; // Libur, tidak perlu alfa
+                    }
+                }
+
+                // Cek apakah sudah ada record absensi untuk pegawai ini di tanggal ini
+                $exists = Attendance::where('user_id', $employee->id)
+                    ->where('tanggal', $tanggal)
+                    ->exists();
+
+                if (!$exists) {
+                    Attendance::create([
+                        'user_id'    => $employee->id,
+                        'tanggal'    => $tanggal,
+                        'status'     => 'alfa',
+                        'keterangan' => 'Tidak hadir tanpa keterangan',
+                    ]);
+                    $count++;
                 }
             }
 

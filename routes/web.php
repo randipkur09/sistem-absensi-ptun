@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\InternshipController;
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendance;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\PermissionController as AdminPermission;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboard;
 use App\Http\Controllers\Employee\AttendanceController as EmployeeAttendance;
@@ -55,6 +56,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Shift Management (Satpam)
+    Route::get('/shifts', [ShiftController::class, 'index'])->name('shifts.index');
+    Route::post('/shifts', [ShiftController::class, 'storeShift'])->name('shifts.store');
+    Route::put('/shifts/{shift}', [ShiftController::class, 'updateShift'])->name('shifts.update');
+    Route::delete('/shifts/{shift}', [ShiftController::class, 'destroyShift'])->name('shifts.destroy');
+    Route::post('/shifts/schedule', [ShiftController::class, 'storeSchedule'])->name('shifts.schedule.store');
+    Route::post('/shifts/schedule/bulk', [ShiftController::class, 'storeBulkSchedule'])->name('shifts.schedule.bulk');
+    Route::delete('/shifts/schedule/{schedule}', [ShiftController::class, 'destroySchedule'])->name('shifts.schedule.destroy');
 
     // Permissions/Leave
     Route::get('/permissions', [AdminPermission::class, 'index'])->name('permissions.index');

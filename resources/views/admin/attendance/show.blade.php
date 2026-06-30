@@ -48,7 +48,7 @@
             @endif
             <div>
                 <h4 class="fw-bold mb-1">{{ $attendance->user->name }}</h4>
-                <div class="text-muted">{{ $attendance->user->email }} | {{ ucfirst($attendance->user->employee_type) }}</div>
+                <div class="text-muted">{{ $attendance->user->username }} | {{ ucfirst($attendance->user->employee_type) }}</div>
                 <div class="mt-2">
                     <span class="badge bg-light text-dark me-2"><i class="bi bi-calendar3 me-1"></i> {{ $attendance->tanggal->translatedFormat('l, d F Y') }}</span>
                     <span class="badge-status badge-{{ $attendance->status }}"><i class="bi bi-info-circle me-1"></i> {{ ucfirst($attendance->status) }}</span>

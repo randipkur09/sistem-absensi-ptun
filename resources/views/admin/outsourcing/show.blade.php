@@ -19,7 +19,7 @@
                 </div>
                 
                 <h4 class="fw-bold mb-1">{{ $outsourcing->name }}</h4>
-                <div class="text-muted mb-3">{{ $outsourcing->email }}</div>
+                <div class="text-muted mb-3">{{ $outsourcing->username }}</div>
                 
                 <span class="badge-status badge-{{ $outsourcing->status }} mb-4 px-3 py-2 fs-6">
                     <i class="bi bi-person-circle me-1"></i> Akun {{ ucfirst($outsourcing->status) }}

@@ -15,7 +15,7 @@ class StoreOutsourcingRequest extends FormRequest
     {
         return [
             'name'            => 'required|string|max:255',
-            'email'           => 'required|email|unique:users,email',
+            'username'        => 'required|string|unique:users,username',
             'password'        => 'required|string|min:6|confirmed',
             'phone'           => 'nullable|string|max:20',
             'address'         => 'nullable|string',

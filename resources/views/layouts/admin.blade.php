@@ -13,6 +13,9 @@
     <a href="{{ route('admin.internship.index') }}" class="nav-link {{ request()->routeIs('admin.internship.*') ? 'active' : '' }}">
         <i class="bi bi-mortarboard-fill"></i> Peserta Magang
     </a>
+    <a href="{{ route('admin.shifts.index') }}" class="nav-link {{ request()->routeIs('admin.shifts.*') ? 'active' : '' }}">
+        <i class="bi bi-calendar-week-fill"></i> Jadwal Shift Satpam
+    </a>
 
     <div class="nav-section-title mt-3">Absensi</div>
     <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">

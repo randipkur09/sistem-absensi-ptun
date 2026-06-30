@@ -23,8 +23,8 @@
                             <input type="text" class="form-control" name="name" value="{{ old('name', $internship->name) }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email" value="{{ old('email', $internship->email) }}" required>
+                            <label class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="username" value="{{ old('username', $internship->username) }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Password Baru (Kosongkan jika tidak diubah)</label>

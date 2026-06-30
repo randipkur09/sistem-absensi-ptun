@@ -21,7 +21,9 @@ class AttendanceController extends Controller
             ->where('tanggal', $today)
             ->first();
 
-        return view('employee.attendance.index', compact('todayAttendance', 'setting'));
+        $shiftForToday = $user->isSatpam() ? $user->getShiftForDate($today->format('Y-m-d')) : null;
+
+        return view('employee.attendance.index', compact('todayAttendance', 'setting', 'shiftForToday'));
     }
 
     public function checkIn(Request $request)
@@ -37,10 +39,20 @@ class AttendanceController extends Controller
         $now = Carbon::now();
         $setting = AttendanceSetting::current();
 
+        // Cek shift satpam untuk hari ini
+        $shiftForToday = $user->isSatpam() ? $user->getShiftForDate($today->format('Y-m-d')) : null;
+
         // Check if already checked in today
         $existing = Attendance::where('user_id', $user->id)
             ->where('tanggal', $today)
             ->first();
+
+        if ($user->isSatpam() && !$shiftForToday) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki jadwal shift hari ini (Libur).',
+            ], 422);
+        }
 
         if ($existing && $existing->jam_masuk) {
             return response()->json([
@@ -71,7 +83,10 @@ class AttendanceController extends Controller
 
         // Determine status
         $status = 'hadir';
-        $batasTerlambat = Carbon::parse($setting->batas_terlambat);
+        $batasTerlambat = $shiftForToday 
+            ? Carbon::parse($shiftForToday->batas_terlambat) 
+            : Carbon::parse($setting->batas_terlambat);
+            
         if ($now->format('H:i:s') > $batasTerlambat->format('H:i:s')) {
             $status = 'terlambat';
         }
@@ -83,6 +98,7 @@ class AttendanceController extends Controller
                 'tanggal' => $today,
             ],
             [
+                'shift_id'        => $shiftForToday?->id,
                 'jam_masuk'       => $now->format('H:i:s'),
                 'latitude_masuk'  => $request->latitude,
                 'longitude_masuk' => $request->longitude,

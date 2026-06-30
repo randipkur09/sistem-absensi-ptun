@@ -50,7 +50,7 @@ class InternshipController extends Controller
 
             $userData = [
                 'name'          => $request->name,
-                'email'         => $request->email,
+                'username'      => $request->username,
                 'password'      => Hash::make($request->password),
                 'role_id'       => $pegawaiRole->id,
                 'employee_type' => 'magang',
@@ -102,7 +102,7 @@ class InternshipController extends Controller
         try {
             $userData = [
                 'name'    => $request->name,
-                'email'   => $request->email,
+                'username'   => $request->username,
                 'phone'   => $request->phone,
                 'address' => $request->address,
                 'status'  => $request->status,

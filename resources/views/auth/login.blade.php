@@ -398,10 +398,10 @@
                 <form method="POST" action="{{ route('login') }}" id="loginForm">
                     @csrf
                     <div class="input-group-custom">
-                        <label for="email">Alamat Email</label>
+                        <label for="username">Username</label>
                         <div class="input-wrapper">
-                            <input type="email" id="email" name="email" placeholder="Masukkan email anda" value="{{ old('email') }}" required autofocus>
-                            <i class="bi bi-envelope"></i>
+                            <input type="text" id="username" name="username" placeholder="Masukkan username anda" value="{{ old('username') }}" required autofocus>
+                            <i class="bi bi-person"></i>
                         </div>
                     </div>
 

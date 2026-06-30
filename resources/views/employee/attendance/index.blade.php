@@ -74,6 +74,29 @@
                         <p class="text-muted">Anda sudah melakukan absensi masuk dan pulang hari ini.</p>
                     </div>
                 @else
+                    @if(auth()->user()->isSatpam())
+                        @if($shiftForToday)
+                            <div class="alert alert-info mb-4 border-0 shadow-sm rounded-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info bg-opacity-25 p-2 rounded-circle me-3">
+                                        <i class="bi bi-clock-history fs-4 text-info"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">Jadwal Anda: {{ $shiftForToday->name }}</h6>
+                                        <div class="small mb-0">
+                                            Masuk: {{ \Carbon\Carbon::parse($shiftForToday->jam_masuk_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($shiftForToday->jam_masuk_end)->format('H:i') }} | 
+                                            Pulang: {{ \Carbon\Carbon::parse($shiftForToday->jam_pulang)->format('H:i') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-warning mb-4 border-0 shadow-sm rounded-3">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> Anda tidak memiliki jadwal shift hari ini (Libur). Jika ini kesalahan, hubungi Admin.
+                            </div>
+                        @endif
+                    @endif
+
                     <div class="row g-4">
                         <!-- Camera Section -->
                         <div class="col-md-6">

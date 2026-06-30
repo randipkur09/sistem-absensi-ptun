@@ -13,6 +13,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'role_id',
@@ -80,6 +81,31 @@ class User extends Authenticatable
     public function isMagang(): bool
     {
         return $this->employee_type === 'magang';
+    }
+
+    public function isSatpam(): bool
+    {
+        return $this->isOutsourcing()
+            && $this->outsourcingEmployee
+            && strtolower($this->outsourcingEmployee->position) === 'satpam';
+    }
+
+    public function shiftSchedules()
+    {
+        return $this->hasMany(ShiftSchedule::class);
+    }
+
+    /**
+     * Ambil jadwal shift untuk tanggal tertentu.
+     */
+    public function getShiftForDate($date): ?Shift
+    {
+        $schedule = $this->shiftSchedules()
+            ->where('tanggal', $date)
+            ->with('shift')
+            ->first();
+
+        return $schedule?->shift;
     }
 
     public function getPhotoUrlAttribute(): string

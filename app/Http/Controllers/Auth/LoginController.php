@@ -19,7 +19,7 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
@@ -29,7 +29,7 @@ class LoginController extends Controller
             if ($user->status === 'nonaktif') {
                 Auth::logout();
                 return back()->withErrors([
-                    'email' => 'Akun Anda telah dinonaktifkan. Hubungi admin.',
+                    'username' => 'Akun Anda telah dinonaktifkan. Hubungi admin.',
                 ]);
             }
 
@@ -37,8 +37,8 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->withInput($request->only('email'));
+            'username' => 'Username atau password salah.',
+        ])->withInput($request->only('username'));
     }
 
     public function logout(Request $request)
