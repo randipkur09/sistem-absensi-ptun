@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
@@ -32,7 +32,7 @@ class AttendanceController extends Controller
             ->orderBy('jam_masuk', 'desc')
             ->paginate(20);
 
-        $users = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+        $users = User::whereHas('role', fn ($q) => $q->where('name', 'pegawai'))
             ->where('status', 'aktif')
             ->orderBy('name')
             ->get();
@@ -43,6 +43,7 @@ class AttendanceController extends Controller
     public function show(Attendance $attendance)
     {
         $attendance->load('user');
+
         return view('admin.attendance.show', compact('attendance'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,7 @@ class PermissionController extends Controller
     {
         $permission->update([
             'status_approval' => 'approved',
-            'approved_by'     => auth()->id(),
+            'approved_by' => auth()->id(),
         ]);
 
         // Create attendance records for approved leave days
@@ -44,7 +45,7 @@ class PermissionController extends Controller
     {
         $permission->update([
             'status_approval' => 'rejected',
-            'approved_by'     => auth()->id(),
+            'approved_by' => auth()->id(),
         ]);
 
         return back()->with('success', 'Pengajuan berhasil ditolak.');
@@ -56,14 +57,14 @@ class PermissionController extends Controller
         $end = $permission->tanggal_selesai->copy();
 
         while ($start->lte($end)) {
-            if (!$start->isWeekend()) {
-                \App\Models\Attendance::updateOrCreate(
+            if (! $start->isWeekend()) {
+                Attendance::updateOrCreate(
                     [
                         'user_id' => $permission->user_id,
                         'tanggal' => $start->toDateString(),
                     ],
                     [
-                        'status'     => $permission->type,
+                        'status' => $permission->type,
                         'keterangan' => $permission->keterangan,
                     ]
                 );

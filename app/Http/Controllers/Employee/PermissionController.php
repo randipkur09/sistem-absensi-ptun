@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePermissionRequest;
 use App\Models\Permission;
-use Illuminate\Support\Facades\Storage;
 
 class PermissionController extends Controller
 {
@@ -26,11 +25,11 @@ class PermissionController extends Controller
     public function store(StorePermissionRequest $request)
     {
         $data = [
-            'user_id'         => auth()->id(),
-            'tanggal_mulai'   => $request->tanggal_mulai,
+            'user_id' => auth()->id(),
+            'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'type'            => $request->type,
-            'keterangan'      => $request->keterangan,
+            'type' => $request->type,
+            'keterangan' => $request->keterangan,
         ];
 
         if ($request->hasFile('attachment')) {

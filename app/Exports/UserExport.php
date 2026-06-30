@@ -4,11 +4,11 @@ namespace App\Exports;
 
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class UserExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class UserExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     protected $type;
 
@@ -20,7 +20,7 @@ class UserExport implements FromCollection, WithHeadings, WithMapping, ShouldAut
     public function collection()
     {
         $query = User::with(['outsourcingEmployee', 'internshipParticipant'])
-            ->whereHas('role', fn($q) => $q->where('name', 'pegawai'));
+            ->whereHas('role', fn ($q) => $q->where('name', 'pegawai'));
 
         if ($this->type) {
             $query->where('employee_type', $this->type);

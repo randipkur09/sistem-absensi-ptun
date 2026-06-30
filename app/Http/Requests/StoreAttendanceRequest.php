@@ -14,18 +14,18 @@ class StoreAttendanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'latitude'  => 'required|numeric|between:-90,90',
+            'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'foto'      => 'required|string',
+            'foto' => 'required|string',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'latitude.required'  => 'Lokasi GPS diperlukan.',
+            'latitude.required' => 'Lokasi GPS diperlukan.',
             'longitude.required' => 'Lokasi GPS diperlukan.',
-            'foto.required'      => 'Foto wajib diambil.',
+            'foto.required' => 'Foto wajib diambil.',
         ];
     }
 }

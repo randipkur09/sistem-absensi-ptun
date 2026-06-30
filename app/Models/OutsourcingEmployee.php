@@ -20,7 +20,7 @@ class OutsourcingEmployee extends Model
 
     protected $casts = [
         'contract_start' => 'date',
-        'contract_end'   => 'date',
+        'contract_end' => 'date',
     ];
 
     public function user()

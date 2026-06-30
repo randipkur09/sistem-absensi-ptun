@@ -22,8 +22,8 @@ class AttendanceSetting extends Model
     ];
 
     protected $casts = [
-        'office_latitude'   => 'decimal:7',
-        'office_longitude'  => 'decimal:7',
+        'office_latitude' => 'decimal:7',
+        'office_longitude' => 'decimal:7',
         'max_radius_meters' => 'integer',
     ];
 
@@ -33,14 +33,14 @@ class AttendanceSetting extends Model
     public static function current(): self
     {
         return self::first() ?? new self([
-            'office_latitude'   => -5.3971,
-            'office_longitude'  => 105.2668,
-            'office_name'       => 'PTUN Bandar Lampung',
+            'office_latitude' => -5.3971,
+            'office_longitude' => 105.2668,
+            'office_name' => 'PTUN Bandar Lampung',
             'max_radius_meters' => 50,
-            'jam_masuk_start'   => '08:00:00',
-            'jam_masuk_end'     => '08:15:00',
-            'jam_pulang'        => '16:00:00',
-            'batas_terlambat'   => '08:15:00',
+            'jam_masuk_start' => '08:00:00',
+            'jam_masuk_end' => '08:15:00',
+            'jam_pulang' => '16:00:00',
+            'batas_terlambat' => '08:15:00',
         ]);
     }
 }

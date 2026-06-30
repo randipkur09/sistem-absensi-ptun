@@ -41,10 +41,8 @@ class GenerateAlfa extends Command
      * Generate record alfa untuk pegawai yang tidak absen pada hari kerja.
      * Bisa dipanggil dari command maupun dari controller.
      *
-     * @param Carbon $startDate
-     * @param Carbon $endDate
-     * @param int|null $userId  Filter pegawai tertentu (opsional)
-     * @return int  Jumlah record alfa yang dibuat
+     * @param  int|null  $userId  Filter pegawai tertentu (opsional)
+     * @return int Jumlah record alfa yang dibuat
      */
     public static function generateAlfaRecords(Carbon $startDate, Carbon $endDate, ?int $userId = null): int
     {
@@ -52,10 +50,10 @@ class GenerateAlfa extends Command
         $count = 0;
 
         // Ambil pegawai aktif beserta relasinya untuk cek tanggal kontrak/magang
-        $employeesQuery = User::with(['outsourcingEmployee', 'internshipParticipant', 'shiftSchedules' => function($q) use ($startDate, $endDate) {
+        $employeesQuery = User::with(['outsourcingEmployee', 'internshipParticipant', 'shiftSchedules' => function ($q) use ($startDate, $endDate) {
             $q->whereBetween('tanggal', [$startDate, $endDate]);
         }])
-            ->whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+            ->whereHas('role', fn ($q) => $q->where('name', 'pegawai'))
             ->where('status', 'aktif');
 
         if ($userId) {
@@ -74,9 +72,9 @@ class GenerateAlfa extends Command
 
             foreach ($employees as $employee) {
                 $isSatpam = $employee->isSatpam();
-                
+
                 // Jika bukan satpam dan hari ini weekend, skip
-                if (!$isSatpam && $isWeekend) {
+                if (! $isSatpam && $isWeekend) {
                     continue;
                 }
 
@@ -102,14 +100,14 @@ class GenerateAlfa extends Command
                     }
                 }
 
-                if (!$isActiveOnDate) {
+                if (! $isActiveOnDate) {
                     continue;
                 }
 
                 // Jika Satpam, pastikan dia punya jadwal shift di hari ini
                 if ($isSatpam) {
                     $hasSchedule = $employee->shiftSchedules->contains('tanggal', $current->copy()->startOfDay());
-                    if (!$hasSchedule) {
+                    if (! $hasSchedule) {
                         continue; // Libur, tidak perlu alfa
                     }
                 }
@@ -119,11 +117,11 @@ class GenerateAlfa extends Command
                     ->where('tanggal', $tanggal)
                     ->exists();
 
-                if (!$exists) {
+                if (! $exists) {
                     Attendance::create([
-                        'user_id'    => $employee->id,
-                        'tanggal'    => $tanggal,
-                        'status'     => 'alfa',
+                        'user_id' => $employee->id,
+                        'tanggal' => $tanggal,
+                        'status' => 'alfa',
                         'keterangan' => 'Tidak hadir tanpa keterangan',
                     ]);
                     $count++;

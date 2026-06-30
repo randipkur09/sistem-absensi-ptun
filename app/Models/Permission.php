@@ -21,7 +21,7 @@ class Permission extends Model
     ];
 
     protected $casts = [
-        'tanggal_mulai'   => 'date',
+        'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
     ];
 
@@ -47,6 +47,6 @@ class Permission extends Model
 
     public function getAttachmentUrlAttribute(): ?string
     {
-        return $this->attachment ? asset('storage/' . $this->attachment) : null;
+        return $this->attachment ? asset('storage/'.$this->attachment) : null;
     }
 }

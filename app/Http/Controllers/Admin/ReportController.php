@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Console\Commands\GenerateAlfa;
+use App\Exports\AttendanceExport;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\User;
-use App\Exports\AttendanceExport;
-use App\Console\Commands\GenerateAlfa;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -36,7 +36,7 @@ class ReportController extends Controller
         if ($userId) {
             $query->where('user_id', $userId);
         } elseif ($employeeType) {
-            $query->whereHas('user', function($q) use ($employeeType) {
+            $query->whereHas('user', function ($q) use ($employeeType) {
                 $q->where('employee_type', $employeeType);
             });
         }
@@ -50,7 +50,7 @@ class ReportController extends Controller
         if ($userId) {
             $summaryQuery->where('user_id', $userId);
         } elseif ($employeeType) {
-            $summaryQuery->whereHas('user', function($q) use ($employeeType) {
+            $summaryQuery->whereHas('user', function ($q) use ($employeeType) {
                 $q->where('employee_type', $employeeType);
             });
         }
@@ -59,13 +59,13 @@ class ReportController extends Controller
             ->pluck('total', 'status')
             ->toArray();
 
-        $usersQuery = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+        $usersQuery = User::whereHas('role', fn ($q) => $q->where('name', 'pegawai'))
             ->where('status', 'aktif');
-            
+
         if ($employeeType) {
             $usersQuery->where('employee_type', $employeeType);
         }
-        
+
         $users = $usersQuery->orderBy('name')->get();
 
         return view('admin.reports.index', compact(
@@ -95,7 +95,7 @@ class ReportController extends Controller
         if ($userId) {
             $query->where('user_id', $userId);
         } elseif ($employeeType) {
-            $query->whereHas('user', function($q) use ($employeeType) {
+            $query->whereHas('user', function ($q) use ($employeeType) {
                 $q->where('employee_type', $employeeType);
             });
         }
@@ -105,7 +105,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('admin.reports.pdf', compact('attendances', 'startDate', 'endDate'));
         $pdf->setPaper('A4', 'landscape');
 
-        $filename = 'Laporan_Absensi_' . $startDate->format('d-m-Y') . '_sd_' . $endDate->format('d-m-Y') . '.pdf';
+        $filename = 'Laporan_Absensi_'.$startDate->format('d-m-Y').'_sd_'.$endDate->format('d-m-Y').'.pdf';
 
         return $pdf->download($filename);
     }
@@ -126,7 +126,7 @@ class ReportController extends Controller
         // Generate record alfa sebelum export
         GenerateAlfa::generateAlfaRecords($startDate, $endDate, $userId);
 
-        $filename = 'Laporan_Absensi_' . $startDate->format('d-m-Y') . '_sd_' . $endDate->format('d-m-Y') . '.xlsx';
+        $filename = 'Laporan_Absensi_'.$startDate->format('d-m-Y').'_sd_'.$endDate->format('d-m-Y').'.xlsx';
 
         return Excel::download(new AttendanceExport($startDate, $endDate, $userId, $employeeType), $filename);
     }

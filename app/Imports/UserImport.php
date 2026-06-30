@@ -2,15 +2,16 @@
 
 namespace App\Imports;
 
-use App\Models\User;
-use App\Models\Role;
-use App\Models\OutsourcingEmployee;
 use App\Models\InternshipParticipant;
+use App\Models\OutsourcingEmployee;
+use App\Models\Role;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class UserImport implements ToModel, WithHeadingRow, WithValidation
 {
@@ -26,33 +27,33 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
         $pegawaiRole = Role::where('name', 'pegawai')->first();
 
         $user = User::create([
-            'name'          => $row['nama'],
-            'email'         => $row['email'],
-            'password'      => Hash::make($row['password'] ?? 'password123'),
-            'role_id'       => $pegawaiRole->id,
+            'name' => $row['nama'],
+            'email' => $row['email'],
+            'password' => Hash::make($row['password'] ?? 'password123'),
+            'role_id' => $pegawaiRole->id,
             'employee_type' => $this->type,
-            'phone'         => $row['telepon'] ?? null,
-            'address'       => $row['alamat'] ?? null,
-            'status'        => 'aktif',
+            'phone' => $row['telepon'] ?? null,
+            'address' => $row['alamat'] ?? null,
+            'status' => 'aktif',
         ]);
 
         if ($this->type === 'outsourcing') {
             OutsourcingEmployee::create([
-                'user_id'         => $user->id,
-                'company_name'    => $row['perusahaan'] ?? '-',
-                'position'        => $row['jabatan'] ?? '-',
-                'contract_start'  => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
-                'contract_end'    => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addYear()),
+                'user_id' => $user->id,
+                'company_name' => $row['perusahaan'] ?? '-',
+                'position' => $row['jabatan'] ?? '-',
+                'contract_start' => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
+                'contract_end' => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addYear()),
                 'contract_number' => $row['nomor_kontrak'] ?? null,
             ]);
         } else {
             InternshipParticipant::create([
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'institution' => $row['institusi'] ?? '-',
-                'major'       => $row['jurusan'] ?? '-',
-                'start_date'  => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
-                'end_date'    => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addMonths(6)),
-                'supervisor'  => $row['pembimbing'] ?? null,
+                'major' => $row['jurusan'] ?? '-',
+                'start_date' => $this->parseDate($row['tanggal_mulai'] ?? null, now()),
+                'end_date' => $this->parseDate($row['tanggal_selesai'] ?? null, now()->addMonths(6)),
+                'supervisor' => $row['pembimbing'] ?? null,
             ]);
         }
 
@@ -62,7 +63,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'nama'  => 'required|string',
+            'nama' => 'required|string',
             'email' => 'required|email|unique:users,email',
         ];
     }
@@ -78,7 +79,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation
 
         // Jika berupa angka (Excel serial number)
         if (is_numeric($value)) {
-            return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+            return Carbon::instance(Date::excelToDateTimeObject($value));
         }
 
         // Coba format dd/mm/yyyy atau d/m/yyyy

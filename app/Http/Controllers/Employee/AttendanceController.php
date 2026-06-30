@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\AttendanceSetting;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -29,9 +29,9 @@ class AttendanceController extends Controller
     public function checkIn(Request $request)
     {
         $request->validate([
-            'latitude'  => 'required|numeric',
+            'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'foto'      => 'required|string', // base64 encoded image
+            'foto' => 'required|string', // base64 encoded image
         ]);
 
         $user = auth()->user();
@@ -47,7 +47,7 @@ class AttendanceController extends Controller
             ->where('tanggal', $today)
             ->first();
 
-        if ($user->isSatpam() && !$shiftForToday) {
+        if ($user->isSatpam() && ! $shiftForToday) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki jadwal shift hari ini (Libur).',
@@ -73,7 +73,7 @@ class AttendanceController extends Controller
         if ($distance > $setting->max_radius_meters) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda berada di luar radius kantor. Jarak Anda: ' . round($distance, 2) . ' meter dari kantor. Maksimal: ' . $setting->max_radius_meters . ' meter.',
+                'message' => 'Anda berada di luar radius kantor. Jarak Anda: '.round($distance, 2).' meter dari kantor. Maksimal: '.$setting->max_radius_meters.' meter.',
                 'distance' => round($distance, 2),
             ], 422);
         }
@@ -83,10 +83,10 @@ class AttendanceController extends Controller
 
         // Determine status
         $status = 'hadir';
-        $batasTerlambat = $shiftForToday 
-            ? Carbon::parse($shiftForToday->batas_terlambat) 
+        $batasTerlambat = $shiftForToday
+            ? Carbon::parse($shiftForToday->batas_terlambat)
             : Carbon::parse($setting->batas_terlambat);
-            
+
         if ($now->format('H:i:s') > $batasTerlambat->format('H:i:s')) {
             $status = 'terlambat';
         }
@@ -98,20 +98,20 @@ class AttendanceController extends Controller
                 'tanggal' => $today,
             ],
             [
-                'shift_id'        => $shiftForToday?->id,
-                'jam_masuk'       => $now->format('H:i:s'),
-                'latitude_masuk'  => $request->latitude,
+                'shift_id' => $shiftForToday?->id,
+                'jam_masuk' => $now->format('H:i:s'),
+                'latitude_masuk' => $request->latitude,
                 'longitude_masuk' => $request->longitude,
-                'jarak_masuk'     => round($distance, 2),
-                'foto_masuk'      => $fotoName,
-                'status'          => $status,
+                'jarak_masuk' => round($distance, 2),
+                'foto_masuk' => $fotoName,
+                'status' => $status,
             ]
         );
 
         return response()->json([
-            'success'  => true,
-            'message'  => 'Absensi masuk berhasil dicatat! Status: ' . ucfirst($status),
-            'data'     => $attendance,
+            'success' => true,
+            'message' => 'Absensi masuk berhasil dicatat! Status: '.ucfirst($status),
+            'data' => $attendance,
             'distance' => round($distance, 2),
         ]);
     }
@@ -119,9 +119,9 @@ class AttendanceController extends Controller
     public function checkOut(Request $request)
     {
         $request->validate([
-            'latitude'  => 'required|numeric',
+            'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'foto'      => 'required|string', // base64 encoded image
+            'foto' => 'required|string', // base64 encoded image
         ]);
 
         $user = auth()->user();
@@ -134,7 +134,7 @@ class AttendanceController extends Controller
             ->where('tanggal', $today)
             ->first();
 
-        if (!$attendance || !$attendance->jam_masuk) {
+        if (! $attendance || ! $attendance->jam_masuk) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda belum melakukan absensi masuk hari ini.',
@@ -160,7 +160,7 @@ class AttendanceController extends Controller
         if ($distance > $setting->max_radius_meters) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda berada di luar radius kantor. Jarak Anda: ' . round($distance, 2) . ' meter dari kantor. Maksimal: ' . $setting->max_radius_meters . ' meter.',
+                'message' => 'Anda berada di luar radius kantor. Jarak Anda: '.round($distance, 2).' meter dari kantor. Maksimal: '.$setting->max_radius_meters.' meter.',
                 'distance' => round($distance, 2),
             ], 422);
         }
@@ -169,17 +169,17 @@ class AttendanceController extends Controller
         $fotoName = $this->saveBase64Photo($request->foto, 'pulang', $user->id);
 
         $attendance->update([
-            'jam_pulang'       => $now->format('H:i:s'),
-            'latitude_pulang'  => $request->latitude,
+            'jam_pulang' => $now->format('H:i:s'),
+            'latitude_pulang' => $request->latitude,
             'longitude_pulang' => $request->longitude,
-            'jarak_pulang'     => round($distance, 2),
-            'foto_pulang'      => $fotoName,
+            'jarak_pulang' => round($distance, 2),
+            'foto_pulang' => $fotoName,
         ]);
 
         return response()->json([
-            'success'  => true,
-            'message'  => 'Absensi pulang berhasil dicatat!',
-            'data'     => $attendance->fresh(),
+            'success' => true,
+            'message' => 'Absensi pulang berhasil dicatat!',
+            'data' => $attendance->fresh(),
             'distance' => round($distance, 2),
         ]);
     }
@@ -191,7 +191,7 @@ class AttendanceController extends Controller
         $image = str_replace('data:image/webp;base64,', '', $image);
         $image = str_replace(' ', '+', $image);
 
-        $imageName = $type . '_' . $userId . '_' . Carbon::now()->format('Y-m-d_H-i-s') . '.png';
+        $imageName = $type.'_'.$userId.'_'.Carbon::now()->format('Y-m-d_H-i-s').'.png';
 
         Storage::disk('attendance_photos')->put($imageName, base64_decode($image));
 

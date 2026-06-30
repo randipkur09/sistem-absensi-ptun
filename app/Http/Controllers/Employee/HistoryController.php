@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class HistoryController extends Controller
 {
@@ -18,7 +18,7 @@ class HistoryController extends Controller
         if ($request->filled('month')) {
             $date = Carbon::parse($request->month);
             $query->whereMonth('tanggal', $date->month)
-                  ->whereYear('tanggal', $date->year);
+                ->whereYear('tanggal', $date->year);
         }
 
         $attendances = $query->orderBy('tanggal', 'desc')->paginate(20);

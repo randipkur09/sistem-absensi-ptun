@@ -11,6 +11,7 @@ class SettingController extends Controller
     public function index()
     {
         $setting = AttendanceSetting::current();
+
         return view('admin.settings.index', compact('setting'));
     }
 
@@ -18,8 +19,8 @@ class SettingController extends Controller
     {
         $setting = AttendanceSetting::first();
 
-        if (!$setting) {
-            $setting = new AttendanceSetting();
+        if (! $setting) {
+            $setting = new AttendanceSetting;
         }
 
         $setting->fill($request->validated());

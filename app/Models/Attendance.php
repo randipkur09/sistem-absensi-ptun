@@ -28,13 +28,13 @@ class Attendance extends Model
     ];
 
     protected $casts = [
-        'tanggal'          => 'date',
-        'latitude_masuk'   => 'decimal:7',
-        'longitude_masuk'  => 'decimal:7',
-        'latitude_pulang'  => 'decimal:7',
+        'tanggal' => 'date',
+        'latitude_masuk' => 'decimal:7',
+        'longitude_masuk' => 'decimal:7',
+        'latitude_pulang' => 'decimal:7',
         'longitude_pulang' => 'decimal:7',
-        'jarak_masuk'      => 'decimal:2',
-        'jarak_pulang'     => 'decimal:2',
+        'jarak_masuk' => 'decimal:2',
+        'jarak_pulang' => 'decimal:2',
     ];
 
     public function user()
@@ -49,12 +49,12 @@ class Attendance extends Model
 
     public function getFotoMasukUrlAttribute(): ?string
     {
-        return $this->foto_masuk ? asset('storage/attendance-photos/' . $this->foto_masuk) : null;
+        return $this->foto_masuk ? asset('storage/attendance-photos/'.$this->foto_masuk) : null;
     }
 
     public function getFotoPulangUrlAttribute(): ?string
     {
-        return $this->foto_pulang ? asset('storage/attendance-photos/' . $this->foto_pulang) : null;
+        return $this->foto_pulang ? asset('storage/attendance-photos/'.$this->foto_pulang) : null;
     }
 
     /**

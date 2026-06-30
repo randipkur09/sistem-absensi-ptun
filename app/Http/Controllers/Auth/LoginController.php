@@ -14,6 +14,7 @@ class LoginController extends Controller
         if (Auth::check()) {
             return $this->redirectByRole();
         }
+
         return view('auth.login');
     }
 
@@ -28,6 +29,7 @@ class LoginController extends Controller
 
             if ($user->status === 'nonaktif') {
                 Auth::logout();
+
                 return back()->withErrors([
                     'username' => 'Akun Anda telah dinonaktifkan. Hubungi admin.',
                 ]);

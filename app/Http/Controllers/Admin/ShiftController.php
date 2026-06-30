@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Shift;
 use App\Models\ShiftSchedule;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ShiftController extends Controller
 {
@@ -19,7 +19,7 @@ class ShiftController extends Controller
         $shifts = Shift::orderBy('name')->get();
 
         // Ambil semua satpam outsourcing aktif
-        $satpams = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))
+        $satpams = User::whereHas('role', fn ($q) => $q->where('name', 'pegawai'))
             ->where('employee_type', 'outsourcing')
             ->where('status', 'aktif')
             ->whereHas('outsourcingEmployee', function ($q) {
@@ -41,7 +41,7 @@ class ShiftController extends Controller
             ->whereIn('user_id', $satpams->pluck('id'))
             ->get()
             ->groupBy(function ($item) {
-                return $item->user_id . '_' . $item->tanggal->format('Y-m-d');
+                return $item->user_id.'_'.$item->tanggal->format('Y-m-d');
             });
 
         // Buat array hari dalam minggu
@@ -62,15 +62,15 @@ class ShiftController extends Controller
     public function storeShift(Request $request)
     {
         $request->validate([
-            'name'            => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'jam_masuk_start' => 'required|date_format:H:i',
-            'jam_masuk_end'   => 'required|date_format:H:i',
+            'jam_masuk_end' => 'required|date_format:H:i',
             'batas_terlambat' => 'required|date_format:H:i',
-            'jam_pulang'      => 'required|date_format:H:i',
+            'jam_pulang' => 'required|date_format:H:i',
         ]);
 
         Shift::create($request->only([
-            'name', 'jam_masuk_start', 'jam_masuk_end', 'batas_terlambat', 'jam_pulang'
+            'name', 'jam_masuk_start', 'jam_masuk_end', 'batas_terlambat', 'jam_pulang',
         ]));
 
         return redirect()->route('admin.shifts.index')
@@ -80,15 +80,15 @@ class ShiftController extends Controller
     public function updateShift(Request $request, Shift $shift)
     {
         $request->validate([
-            'name'            => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'jam_masuk_start' => 'required|date_format:H:i',
-            'jam_masuk_end'   => 'required|date_format:H:i',
+            'jam_masuk_end' => 'required|date_format:H:i',
             'batas_terlambat' => 'required|date_format:H:i',
-            'jam_pulang'      => 'required|date_format:H:i',
+            'jam_pulang' => 'required|date_format:H:i',
         ]);
 
         $shift->update($request->only([
-            'name', 'jam_masuk_start', 'jam_masuk_end', 'batas_terlambat', 'jam_pulang'
+            'name', 'jam_masuk_start', 'jam_masuk_end', 'batas_terlambat', 'jam_pulang',
         ]));
 
         return redirect()->route('admin.shifts.index')
@@ -108,9 +108,9 @@ class ShiftController extends Controller
     public function storeSchedule(Request $request)
     {
         $request->validate([
-            'user_id'  => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
             'shift_id' => 'required|exists:shifts,id',
-            'tanggal'  => 'required|date',
+            'tanggal' => 'required|date',
         ]);
 
         ShiftSchedule::updateOrCreate(
@@ -132,9 +132,9 @@ class ShiftController extends Controller
     public function storeBulkSchedule(Request $request)
     {
         $request->validate([
-            'schedules'            => 'required|array',
-            'schedules.*.user_id'  => 'required|exists:users,id',
-            'schedules.*.tanggal'  => 'required|date',
+            'schedules' => 'required|array',
+            'schedules.*.user_id' => 'required|exists:users,id',
+            'schedules.*.tanggal' => 'required|date',
             'schedules.*.shift_id' => 'nullable|exists:shifts,id',
         ]);
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Attendance;
 use App\Models\Permission;
+use App\Models\User;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $currentMonth = Carbon::now();
 
         // Statistik pengguna
-        $totalUsers = User::whereHas('role', fn($q) => $q->where('name', 'pegawai'))->count();
+        $totalUsers = User::whereHas('role', fn ($q) => $q->where('name', 'pegawai'))->count();
         $totalOutsourcing = User::where('employee_type', 'outsourcing')->where('status', 'aktif')->count();
         $totalMagang = User::where('employee_type', 'magang')->where('status', 'aktif')->count();
 

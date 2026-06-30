@@ -3,22 +3,24 @@
 namespace App\Exports;
 
 use App\Models\Attendance;
-use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 
-class AttendanceExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize, WithCustomValueBinder
+class AttendanceExport extends DefaultValueBinder implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithMapping, WithTitle
 {
     protected $startDate;
+
     protected $endDate;
+
     protected $userId;
+
     protected $employeeType;
 
     public function __construct($startDate, $endDate, $userId = null, $employeeType = null)
@@ -35,11 +37,13 @@ class AttendanceExport extends DefaultValueBinder implements FromCollection, Wit
             // Jam Masuk / Jam Pulang format (e.g., "08:21:20")
             if (preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $value)) {
                 $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
                 return true;
             }
             // Tanggal format (e.g., "22/06/2026")
             if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
                 $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
                 return true;
             }
         }
@@ -55,7 +59,7 @@ class AttendanceExport extends DefaultValueBinder implements FromCollection, Wit
         if ($this->userId) {
             $query->where('user_id', $this->userId);
         } elseif ($this->employeeType) {
-            $query->whereHas('user', function($q) {
+            $query->whereHas('user', function ($q) {
                 $q->where('employee_type', $this->employeeType);
             });
         }

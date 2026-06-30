@@ -1,21 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
-use App\Http\Controllers\Admin\OutsourcingController;
-use App\Http\Controllers\Admin\InternshipController;
+use App\Exports\UserExport;
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendance;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\InternshipController;
+use App\Http\Controllers\Admin\OutsourcingController;
+use App\Http\Controllers\Admin\PermissionController as AdminPermission;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShiftController;
-use App\Http\Controllers\Admin\PermissionController as AdminPermission;
-use App\Http\Controllers\Employee\DashboardController as EmployeeDashboard;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Employee\AttendanceController as EmployeeAttendance;
+use App\Http\Controllers\Employee\DashboardController as EmployeeDashboard;
 use App\Http\Controllers\Employee\HistoryController;
 use App\Http\Controllers\Employee\PermissionController as EmployeePermission;
-use App\Exports\UserExport;
 use App\Imports\UserImport;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
 /*
@@ -73,13 +74,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
 
     // Import/Export Users
     Route::get('/export-users/{type}', function ($type) {
-        $filename = 'Data_' . ucfirst($type) . '_' . now()->format('d-m-Y') . '.xlsx';
+        $filename = 'Data_'.ucfirst($type).'_'.now()->format('d-m-Y').'.xlsx';
+
         return Excel::download(new UserExport($type), $filename);
     })->name('export-users');
 
-    Route::post('/import-users/{type}', function (\Illuminate\Http\Request $request, $type) {
+    Route::post('/import-users/{type}', function (Request $request, $type) {
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv|max:5120']);
         Excel::import(new UserImport($type), $request->file('file'));
+
         return back()->with('success', 'Data berhasil diimport.');
     })->name('import-users');
 });
