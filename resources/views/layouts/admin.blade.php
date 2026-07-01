@@ -21,15 +21,7 @@
     <a href="{{ route('admin.attendance.index') }}" class="nav-link {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">
         <i class="bi bi-clipboard-check-fill"></i> Data Absensi
     </a>
-    <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}">
-        <i class="bi bi-envelope-paper-fill"></i> Izin/Sakit
-        @php
-            $pendingCount = \App\Models\Permission::where('status_approval', 'pending')->count();
-        @endphp
-        @if($pendingCount > 0)
-            <span class="badge rounded-pill ms-auto" style="background: var(--secondary); color: #1a1a1a; font-size: 0.6rem; font-weight: 700;">{{ $pendingCount }}</span>
-        @endif
-    </a>
+
     <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
         <i class="bi bi-file-earmark-bar-graph-fill"></i> Laporan
     </a>

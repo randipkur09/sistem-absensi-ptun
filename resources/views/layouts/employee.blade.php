@@ -14,14 +14,5 @@
         <i class="bi bi-clock-history"></i> Riwayat
     </a>
 
-    <div class="nav-section-title mt-3">Pengajuan</div>
-    <a href="{{ route('employee.permissions.index') }}" class="nav-link {{ request()->routeIs('employee.permissions.*') ? 'active' : '' }}">
-        <i class="bi bi-envelope-paper-fill"></i> Izin/Sakit
-        @php
-            $myPending = \App\Models\Permission::where('user_id', auth()->id())->where('status_approval', 'pending')->count();
-        @endphp
-        @if($myPending > 0)
-            <span class="badge rounded-pill ms-auto" style="background: var(--secondary); color: #1a1a1a; font-size: 0.6rem; font-weight: 700;">{{ $myPending }} Proses</span>
-        @endif
-    </a>
+
 @endsection

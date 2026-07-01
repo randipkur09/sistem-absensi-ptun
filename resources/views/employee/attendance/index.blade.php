@@ -67,11 +67,11 @@
                 <div class="text-muted small mt-1">{{ now()->translatedFormat('l, d F Y') }}</div>
             </div>
             <div class="card-body p-4">
-                @if($todayAttendance && $todayAttendance->jam_masuk && $todayAttendance->jam_pulang)
+                @if($todayAttendance && ($todayAttendance->jam_pulang || $todayAttendance->status !== 'hadir'))
                     <div class="text-center py-5">
                         <div class="display-1 mb-3" style="color: var(--success);"><i class="bi bi-check-circle-fill"></i></div>
                         <h4>Absensi Selesai</h4>
-                        <p class="text-muted">Anda sudah melakukan absensi masuk dan pulang hari ini.</p>
+                        <p class="text-muted">Anda sudah melakukan absensi hari ini (Status: {{ ucfirst($todayAttendance->status) }}).</p>
                     </div>
                 @else
                     @if(auth()->user()->isSatpam())
@@ -139,10 +139,23 @@
                                 <input type="hidden" id="foto" name="foto">
                                 
                                 @if(!$todayAttendance || !$todayAttendance->jam_masuk)
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small text-muted">Status Absensi</label>
+                                        <select class="form-select mb-2" id="status_absensi" name="status_absensi">
+                                            <option value="hadir">Hadir</option>
+                                            <option value="sakit">Sakit</option>
+                                            <option value="izin">Izin</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3 d-none" id="keterangan_container">
+                                        <label class="form-label fw-bold small text-muted">Keterangan</label>
+                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="2" placeholder="Masukkan alasan / keterangan (wajib)"></textarea>
+                                    </div>
+                                    
                                     <button type="button" id="btn-submit-masuk" class="btn btn-primary-custom w-100 py-2 mb-2" disabled>
                                         <i class="bi bi-box-arrow-in-right me-2"></i>Absen Masuk
                                     </button>
-                                @elseif(!$todayAttendance->jam_pulang)
+                                @elseif(!$todayAttendance->jam_pulang && $todayAttendance->status === 'hadir')
                                     <button type="button" id="btn-submit-pulang" class="btn btn-success-custom w-100 py-2 mb-2" disabled>
                                         <i class="bi bi-box-arrow-right me-2"></i>Absen Pulang
                                     </button>
@@ -316,12 +329,37 @@
         // --- Submit Logic ---
         const btnMasuk = document.getElementById('btn-submit-masuk');
         const btnPulang = document.getElementById('btn-submit-pulang');
+        const statusSelect = document.getElementById('status_absensi');
+        const ketContainer = document.getElementById('keterangan_container');
+        const ketInput = document.getElementById('keterangan');
+
+        if (statusSelect) {
+            statusSelect.addEventListener('change', function() {
+                if (this.value === 'hadir') {
+                    ketContainer.classList.add('d-none');
+                } else {
+                    ketContainer.classList.remove('d-none');
+                }
+                checkSubmitStatus();
+            });
+        }
+        
+        if (ketInput) {
+            ketInput.addEventListener('input', checkSubmitStatus);
+        }
 
         function checkSubmitStatus() {
             const hasPhoto = inputFoto.value !== '';
             
             if (btnMasuk) {
-                btnMasuk.disabled = !(isLocationValid && hasPhoto);
+                const status = statusSelect ? statusSelect.value : 'hadir';
+                const hasKet = ketInput ? ketInput.value.trim() !== '' : false;
+                
+                if (status === 'hadir') {
+                    btnMasuk.disabled = !(isLocationValid && hasPhoto);
+                } else {
+                    btnMasuk.disabled = !(hasPhoto && hasKet);
+                }
             }
             if (btnPulang) {
                 btnPulang.disabled = !(isLocationValid && hasPhoto);
@@ -329,6 +367,9 @@
         }
 
         function submitAttendance(url, type) {
+            const status = statusSelect ? statusSelect.value : 'hadir';
+            const keterangan = ketInput ? ketInput.value : '';
+
             Swal.fire({
                 title: 'Memproses Absensi...',
                 allowOutsideClick: false,
@@ -344,7 +385,9 @@
                 body: JSON.stringify({
                     latitude: inputLat.value,
                     longitude: inputLng.value,
-                    foto: inputFoto.value
+                    foto: inputFoto.value,
+                    status_absensi: status,
+                    keterangan: keterangan
                 })
             })
             .then(response => response.json())

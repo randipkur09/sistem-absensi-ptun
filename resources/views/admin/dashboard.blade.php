@@ -55,17 +55,6 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6 animate-fade-in">
-        <div class="stat-card warning">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="stat-label">Izin Pending</div>
-                    <div class="stat-value">{{ $pendingPermissions }}</div>
-                </div>
-                <div class="stat-icon"><i class="bi bi-envelope-exclamation-fill"></i></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Today's Attendance Stats -->

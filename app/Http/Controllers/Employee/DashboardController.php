@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\AttendanceSetting;
-use App\Models\Permission;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -37,16 +36,11 @@ class DashboardController extends Controller
             ->take(7)
             ->get();
 
-        // Pending permissions
-        $pendingPermissions = Permission::where('user_id', $user->id)
-            ->where('status_approval', 'pending')
-            ->count();
 
         return view('employee.dashboard', compact(
             'todayAttendance',
             'monthlyStats',
             'recentAttendances',
-            'pendingPermissions',
             'setting'
         ));
     }

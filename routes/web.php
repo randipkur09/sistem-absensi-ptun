@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\AttendanceController as AdminAttendance;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\InternshipController;
 use App\Http\Controllers\Admin\OutsourcingController;
-use App\Http\Controllers\Admin\PermissionController as AdminPermission;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShiftController;
@@ -13,7 +12,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Employee\AttendanceController as EmployeeAttendance;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboard;
 use App\Http\Controllers\Employee\HistoryController;
-use App\Http\Controllers\Employee\PermissionController as EmployeePermission;
 use App\Imports\UserImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,11 +65,6 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
     Route::post('/shifts/schedule/bulk', [ShiftController::class, 'storeBulkSchedule'])->name('shifts.schedule.bulk');
     Route::delete('/shifts/schedule/{schedule}', [ShiftController::class, 'destroySchedule'])->name('shifts.schedule.destroy');
 
-    // Permissions/Leave
-    Route::get('/permissions', [AdminPermission::class, 'index'])->name('permissions.index');
-    Route::put('/permissions/{permission}/approve', [AdminPermission::class, 'approve'])->name('permissions.approve');
-    Route::put('/permissions/{permission}/reject', [AdminPermission::class, 'reject'])->name('permissions.reject');
-
     // Import/Export Users
     Route::get('/export-users/{type}', function ($type) {
         $filename = 'Data_'.ucfirst($type).'_'.now()->format('d-m-Y').'.xlsx';
@@ -99,9 +92,4 @@ Route::prefix('employee')->middleware(['auth', 'role:pegawai'])->name('employee.
 
     // History
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
-
-    // Permissions/Leave
-    Route::get('/permissions', [EmployeePermission::class, 'index'])->name('permissions.index');
-    Route::get('/permissions/create', [EmployeePermission::class, 'create'])->name('permissions.create');
-    Route::post('/permissions', [EmployeePermission::class, 'store'])->name('permissions.store');
 });

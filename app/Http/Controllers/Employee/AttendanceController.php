@@ -29,10 +29,16 @@ class AttendanceController extends Controller
     public function checkIn(Request $request)
     {
         $request->validate([
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'status_absensi' => 'required|in:hadir,sakit,izin',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'foto' => 'required|string', // base64 encoded image
+            'keterangan' => 'nullable|string',
         ]);
+
+        $statusAbsensi = $request->status_absensi;
+        $latitude = $request->latitude ?? 0;
+        $longitude = $request->longitude ?? 0;
 
         $user = auth()->user();
         $today = Carbon::today();
@@ -61,34 +67,39 @@ class AttendanceController extends Controller
             ], 422);
         }
 
-        // Calculate distance using Haversine formula
-        $distance = Attendance::haversineDistance(
-            $request->latitude,
-            $request->longitude,
-            $setting->office_latitude,
-            $setting->office_longitude
-        );
+        // Calculate distance using Haversine formula if status is hadir
+        $distance = 0;
+        if ($statusAbsensi === 'hadir') {
+            $distance = Attendance::haversineDistance(
+                $latitude,
+                $longitude,
+                $setting->office_latitude,
+                $setting->office_longitude
+            );
 
-        // Validate distance
-        if ($distance > $setting->max_radius_meters) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda berada di luar radius kantor. Jarak Anda: '.round($distance, 2).' meter dari kantor. Maksimal: '.$setting->max_radius_meters.' meter.',
-                'distance' => round($distance, 2),
-            ], 422);
+            // Validate distance
+            if ($distance > $setting->max_radius_meters) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda berada di luar radius kantor. Jarak Anda: '.round($distance, 2).' meter dari kantor. Maksimal: '.$setting->max_radius_meters.' meter.',
+                    'distance' => round($distance, 2),
+                ], 422);
+            }
         }
 
         // Save photo from base64
         $fotoName = $this->saveBase64Photo($request->foto, 'masuk', $user->id);
 
         // Determine status
-        $status = 'hadir';
-        $batasTerlambat = $shiftForToday
-            ? Carbon::parse($shiftForToday->batas_terlambat)
-            : Carbon::parse($setting->batas_terlambat);
+        $status = $statusAbsensi;
+        if ($status === 'hadir') {
+            $batasTerlambat = $shiftForToday
+                ? Carbon::parse($shiftForToday->batas_terlambat)
+                : Carbon::parse($setting->batas_terlambat);
 
-        if ($now->format('H:i:s') > $batasTerlambat->format('H:i:s')) {
-            $status = 'terlambat';
+            if ($now->format('H:i:s') > $batasTerlambat->format('H:i:s')) {
+                $status = 'terlambat';
+            }
         }
 
         // Create or update attendance
@@ -100,11 +111,12 @@ class AttendanceController extends Controller
             [
                 'shift_id' => $shiftForToday?->id,
                 'jam_masuk' => $now->format('H:i:s'),
-                'latitude_masuk' => $request->latitude,
-                'longitude_masuk' => $request->longitude,
+                'latitude_masuk' => $latitude,
+                'longitude_masuk' => $longitude,
                 'jarak_masuk' => round($distance, 2),
                 'foto_masuk' => $fotoName,
                 'status' => $status,
+                'keterangan' => $request->keterangan,
             ]
         );
 
