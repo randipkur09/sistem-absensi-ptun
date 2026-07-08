@@ -21,9 +21,15 @@
                 <h4 class="fw-bold mb-1">{{ $internship->name }}</h4>
                 <div class="text-muted mb-3">{{ $internship->username }}</div>
                 
-                <span class="badge-status badge-{{ $internship->status }} mb-4 px-3 py-2 fs-6">
-                    <i class="bi bi-person-circle me-1"></i> Akun {{ ucfirst($internship->status) }}
-                </span>
+                @if($internship->internshipParticipant && now()->between($internship->internshipParticipant->start_date, $internship->internshipParticipant->end_date))
+                    <span class="badge-status badge-aktif mb-4 px-3 py-2 fs-6">
+                        <i class="bi bi-person-circle me-1"></i> Akun Aktif
+                    </span>
+                @else
+                    <span class="badge-status badge-nonaktif mb-4 px-3 py-2 fs-6">
+                        <i class="bi bi-person-circle me-1"></i> Akun Nonaktif
+                    </span>
+                @endif
 
                 <div class="d-grid gap-2">
                     <a href="{{ route('admin.internship.edit', $internship->id) }}" class="btn btn-warning text-white fw-bold">
@@ -58,10 +64,20 @@
                             {{ optional($internship->internshipParticipant->start_date)->format('d/m/Y') }} - 
                             {{ optional($internship->internshipParticipant->end_date)->format('d/m/Y') }}
                         </div>
-                        @if($internship->internshipParticipant && !$internship->internshipParticipant->isActive())
-                            <span class="badge bg-danger mt-1">Magang Selesai</span>
-                        @else
-                            <span class="badge bg-success mt-1">Magang Aktif</span>
+                        @if($internship->internshipParticipant)
+                            @if(now()->lt($internship->internshipParticipant->start_date))
+                                <span class="badge-period-status badge-belum-mulai mt-1">
+                                    Belum Mulai Magang
+                                </span>
+                            @elseif(now()->between($internship->internshipParticipant->start_date, $internship->internshipParticipant->end_date))
+                                <span class="badge-period-status badge-sedang-aktif mt-1">
+                                    Sedang Magang
+                                </span>
+                            @else
+                                <span class="badge-period-status badge-selesai mt-1">
+                                    Selesai Magang
+                                </span>
+                            @endif
                         @endif
                     </div>
                     <div class="col-sm-4 border-bottom pb-3">

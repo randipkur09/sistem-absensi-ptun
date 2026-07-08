@@ -21,9 +21,15 @@
                 <h4 class="fw-bold mb-1">{{ $outsourcing->name }}</h4>
                 <div class="text-muted mb-3">{{ $outsourcing->username }}</div>
                 
-                <span class="badge-status badge-{{ $outsourcing->status }} mb-4 px-3 py-2 fs-6">
-                    <i class="bi bi-person-circle me-1"></i> Akun {{ ucfirst($outsourcing->status) }}
-                </span>
+                @if($outsourcing->outsourcingEmployee && now()->between($outsourcing->outsourcingEmployee->contract_start, $outsourcing->outsourcingEmployee->contract_end))
+                    <span class="badge-status badge-aktif mb-4 px-3 py-2 fs-6">
+                        <i class="bi bi-person-circle me-1"></i> Akun Aktif
+                    </span>
+                @else
+                    <span class="badge-status badge-nonaktif mb-4 px-3 py-2 fs-6">
+                        <i class="bi bi-person-circle me-1"></i> Akun Nonaktif
+                    </span>
+                @endif
 
                 <div class="d-grid gap-2">
                     <a href="{{ route('admin.outsourcing.edit', $outsourcing->id) }}" class="btn btn-warning text-white fw-bold">
@@ -58,10 +64,20 @@
                             {{ optional($outsourcing->outsourcingEmployee->contract_start)->format('d/m/Y') }} - 
                             {{ optional($outsourcing->outsourcingEmployee->contract_end)->format('d/m/Y') }}
                         </div>
-                        @if($outsourcing->outsourcingEmployee && !$outsourcing->outsourcingEmployee->isContractActive())
-                            <span class="badge bg-danger mt-1">Kontrak Berakhir</span>
-                        @else
-                            <span class="badge bg-success mt-1">Kontrak Aktif</span>
+                        @if($outsourcing->outsourcingEmployee)
+                            @if(now()->lt($outsourcing->outsourcingEmployee->contract_start))
+                                <span class="badge-period-status badge-belum-mulai mt-1">
+                                    Belum Mulai Kontrak
+                                </span>
+                            @elseif(now()->between($outsourcing->outsourcingEmployee->contract_start, $outsourcing->outsourcingEmployee->contract_end))
+                                <span class="badge-period-status badge-sedang-aktif mt-1">
+                                    Kontrak Aktif
+                                </span>
+                            @else
+                                <span class="badge-period-status badge-selesai mt-1">
+                                    Kontrak Berakhir
+                                </span>
+                            @endif
                         @endif
                     </div>
                     <div class="col-sm-4 border-bottom pb-3">

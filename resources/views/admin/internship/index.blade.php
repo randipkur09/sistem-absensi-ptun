@@ -77,15 +77,29 @@
                             @if($item->internshipParticipant)
                                 <div><small>Mulai: {{ $item->internshipParticipant->start_date->format('d/m/Y') }}</small></div>
                                 <div><small>Selesai: {{ $item->internshipParticipant->end_date->format('d/m/Y') }}</small></div>
-                                @if(!$item->internshipParticipant->isActive())
-                                    <span class="badge bg-danger mt-1">Selesai Magang</span>
+                                @if(now()->lt($item->internshipParticipant->start_date))
+                                    <span class="badge-period-status badge-belum-mulai mt-1">
+                                        Belum Mulai Magang
+                                    </span>
+                                @elseif(now()->between($item->internshipParticipant->start_date, $item->internshipParticipant->end_date))
+                                    <span class="badge-period-status badge-sedang-aktif mt-1">
+                                        Sedang Magang
+                                    </span>
+                                @else
+                                    <span class="badge-period-status badge-selesai mt-1">
+                                        Selesai Magang
+                                    </span>
                                 @endif
                             @else
                                 -
                             @endif
                         </td>
                         <td>
-                            <span class="badge-status badge-{{ $item->status }}">{{ ucfirst($item->status) }}</span>
+                            @if($item->internshipParticipant && now()->between($item->internshipParticipant->start_date, $item->internshipParticipant->end_date))
+                                <span class="badge-status badge-aktif">Aktif</span>
+                            @else
+                                <span class="badge-status badge-nonaktif">Nonaktif</span>
+                            @endif
                         </td>
                         <td class="text-center">
                             <div class="btn-group">

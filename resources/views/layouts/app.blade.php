@@ -416,6 +416,40 @@
         .badge-approved    { background: #dcfce7; color: #166534; }
         .badge-rejected    { background: #fee2e2; color: #991b1b; }
 
+        /* ── Period / Contract Status Badges ─────────────────────── */
+        .badge-period-status {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        /* Belum Mulai (Not Started) - Slate/Gray */
+        .badge-belum-mulai {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Sedang Aktif (Active / In Progress) - Green */
+        .badge-sedang-aktif {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Selesai / Berakhir (Completed / Ended) - Red-Orange */
+        .badge-selesai {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
         /* ================================================================
            BUTTONS
            ================================================================ */

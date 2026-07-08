@@ -77,15 +77,29 @@
                             @if($item->outsourcingEmployee)
                                 <div><small>Mulai: {{ $item->outsourcingEmployee->contract_start->format('d/m/Y') }}</small></div>
                                 <div><small>Selesai: {{ $item->outsourcingEmployee->contract_end->format('d/m/Y') }}</small></div>
-                                @if(!$item->outsourcingEmployee->isContractActive())
-                                    <span class="badge bg-danger mt-1">Kontrak Habis</span>
+                                @if(now()->lt($item->outsourcingEmployee->contract_start))
+                                    <span class="badge-period-status badge-belum-mulai mt-1">
+                                        Belum Mulai Kontrak
+                                    </span>
+                                @elseif(now()->between($item->outsourcingEmployee->contract_start, $item->outsourcingEmployee->contract_end))
+                                    <span class="badge-period-status badge-sedang-aktif mt-1">
+                                        Kontrak Aktif
+                                    </span>
+                                @else
+                                    <span class="badge-period-status badge-selesai mt-1">
+                                        Kontrak Berakhir
+                                    </span>
                                 @endif
                             @else
                                 -
                             @endif
                         </td>
                         <td>
-                            <span class="badge-status badge-{{ $item->status }}">{{ ucfirst($item->status) }}</span>
+                            @if($item->outsourcingEmployee && now()->between($item->outsourcingEmployee->contract_start, $item->outsourcingEmployee->contract_end))
+                                <span class="badge-status badge-aktif">Aktif</span>
+                            @else
+                                <span class="badge-status badge-nonaktif">Nonaktif</span>
+                            @endif
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
