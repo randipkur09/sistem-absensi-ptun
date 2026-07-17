@@ -203,9 +203,42 @@ class AttendanceController extends Controller
         $image = str_replace('data:image/webp;base64,', '', $image);
         $image = str_replace(' ', '+', $image);
 
-        $imageName = $type.'_'.$userId.'_'.Carbon::now()->format('Y-m-d_H-i-s').'.png';
+        $imageData = base64_decode($image);
 
-        Storage::disk('attendance_photos')->put($imageName, base64_decode($image));
+        // Kompres gambar menggunakan GD Library
+        $sourceImage = imagecreatefromstring($imageData);
+
+        if ($sourceImage !== false) {
+            // Resize jika terlalu besar (max 800px lebar/tinggi)
+            $maxDimension = 800;
+            $origWidth = imagesx($sourceImage);
+            $origHeight = imagesy($sourceImage);
+
+            if ($origWidth > $maxDimension || $origHeight > $maxDimension) {
+                $ratio = min($maxDimension / $origWidth, $maxDimension / $origHeight);
+                $newWidth = (int) round($origWidth * $ratio);
+                $newHeight = (int) round($origHeight * $ratio);
+
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+                imagedestroy($sourceImage);
+                $sourceImage = $resizedImage;
+            }
+
+            // Simpan sebagai JPEG dengan kualitas 60% (hemat ~80% ukuran dari PNG)
+            $imageName = $type . '_' . $userId . '_' . Carbon::now()->format('Y-m-d_H-i-s') . '.jpg';
+
+            ob_start();
+            imagejpeg($sourceImage, null, 60);
+            $compressedData = ob_get_clean();
+            imagedestroy($sourceImage);
+
+            Storage::disk('attendance_photos')->put($imageName, $compressedData);
+        } else {
+            // Fallback: simpan tanpa kompresi jika GD gagal
+            $imageName = $type . '_' . $userId . '_' . Carbon::now()->format('Y-m-d_H-i-s') . '.png';
+            Storage::disk('attendance_photos')->put($imageName, $imageData);
+        }
 
         return $imageName;
     }

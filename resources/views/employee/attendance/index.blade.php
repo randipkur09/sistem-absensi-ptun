@@ -67,7 +67,7 @@
                 <div class="text-muted small mt-1">{{ now()->translatedFormat('l, d F Y') }}</div>
             </div>
             <div class="card-body p-4">
-                @if($todayAttendance && ($todayAttendance->jam_pulang || $todayAttendance->status !== 'hadir'))
+                @if($todayAttendance && ($todayAttendance->jam_pulang || !in_array($todayAttendance->status, ['hadir', 'terlambat'])))
                     <div class="text-center py-5">
                         <div class="display-1 mb-3" style="color: var(--success);"><i class="bi bi-check-circle-fill"></i></div>
                         <h4>Absensi Selesai</h4>
@@ -155,7 +155,7 @@
                                     <button type="button" id="btn-submit-masuk" class="btn btn-primary-custom w-100 py-2 mb-2" disabled>
                                         <i class="bi bi-box-arrow-in-right me-2"></i>Absen Masuk
                                     </button>
-                                @elseif(!$todayAttendance->jam_pulang && $todayAttendance->status === 'hadir')
+                                @elseif(!$todayAttendance->jam_pulang && in_array($todayAttendance->status, ['hadir', 'terlambat']))
                                     <button type="button" id="btn-submit-pulang" class="btn btn-success-custom w-100 py-2 mb-2" disabled>
                                         <i class="bi bi-box-arrow-right me-2"></i>Absen Pulang
                                     </button>
@@ -394,7 +394,11 @@
             .then(data => {
                 if(data.success) {
                     Swal.fire('Berhasil!', data.message, 'success').then(() => {
-                        window.location.reload();
+                        if (type === 'masuk') {
+                            window.location.href = '{{ route("employee.dashboard", [], false) }}';
+                        } else {
+                            window.location.reload();
+                        }
                     });
                 } else {
                     Swal.fire('Gagal', data.message, 'error');

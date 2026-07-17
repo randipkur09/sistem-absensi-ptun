@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // Generate record alfa setiap hari jam 23:55 untuk pegawai yang tidak absen hari ini
         $schedule->command('attendance:generate-alfa')->dailyAt('23:55');
+
+        // Hapus foto absensi yang lebih dari 7 hari setiap hari Minggu jam 01:00
+        $schedule->command('attendance:cleanup-photos')->weeklyOn(0, '01:00');
     }
 
     /**
