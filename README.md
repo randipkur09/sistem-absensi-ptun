@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/PHP-8.1+-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
   <img src="https://img.shields.io/badge/Vite-5.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Blade-Templates-F05340?style=for-the-badge&logo=laravel&logoColor=white" alt="Blade">
 </p>
 
 ---
@@ -19,24 +20,25 @@
 **Sistem Absensi PTUN** adalah aplikasi web untuk mengelola kehadiran pegawai di lingkungan Pengadilan Tata Usaha Negara (PTUN) Bandar Lampung. Aplikasi ini mendukung dua jenis pegawai yaitu **Outsourcing** dan **Magang (Internship)**, dengan fitur absensi berbasis **GPS & Geolocation** serta **foto selfie** sebagai bukti kehadiran.
 
 Sistem ini memiliki dua panel utama:
-- **Panel Admin** — untuk mengelola data pegawai, memantau kehadiran, mengelola perizinan, dan menghasilkan laporan.
-- **Panel Pegawai** — untuk melakukan absensi harian (check-in & check-out), melihat riwayat, dan mengajukan izin/sakit.
+- **Panel Admin** — untuk mengelola data pegawai, memantau kehadiran, mengelola jadwal shift, dan menghasilkan laporan.
+- **Panel Pegawai** — untuk melakukan absensi harian (check-in & check-out) dan melihat riwayat kehadiran.
 
 ---
 
 ## ✨ Fitur Utama
 
 ### 🔐 Autentikasi & Otorisasi
-- Login dengan email & password
+- Login dengan **username** & password
 - Role-based access control (Admin & Pegawai)
 - Middleware proteksi route berdasarkan role
+- Pengecekan status akun (akun `nonaktif` tidak dapat login)
 
 ### 👨‍💼 Panel Admin
 - **Dashboard** — Ringkasan statistik kehadiran & data pegawai
 - **Manajemen Pegawai Outsourcing** — CRUD lengkap (Create, Read, Update, Delete) dengan data kontrak
 - **Manajemen Peserta Magang** — CRUD lengkap dengan data institusi & periode magang
 - **Monitoring Kehadiran** — Lihat detail absensi seluruh pegawai
-- **Manajemen Perizinan** — Approve/Reject pengajuan izin & sakit dari pegawai
+- **Manajemen Shift** — Kelola shift kerja (Pagi/Siang/Malam) untuk Satpam, atur jadwal shift per pegawai, dan penjadwalan massal (bulk schedule)
 - **Laporan Absensi** — Filter berdasarkan periode & pegawai, dengan ringkasan statistik
 - **Export Laporan** — Export ke format **PDF** dan **Excel (.xlsx)**
 - **Import/Export Data Pegawai** — Import data pegawai dari file Excel, export ke Excel
@@ -47,7 +49,13 @@ Sistem ini memiliki dua panel utama:
 - **Absensi Masuk (Check-in)** — Dengan validasi GPS, radius lokasi, dan foto selfie
 - **Absensi Pulang (Check-out)** — Dengan validasi GPS, radius lokasi, dan foto selfie
 - **Riwayat Kehadiran** — Histori absensi lengkap
-- **Pengajuan Izin/Sakit** — Form pengajuan dengan upload lampiran
+
+### 🔄 Manajemen Shift
+- Definisi multiple shift (contoh: Shift Pagi, Shift Siang, Shift Malam) dengan jam kerja masing-masing
+- Penjadwalan shift per pegawai per hari
+- **Bulk scheduling** — Atur jadwal shift untuk banyak pegawai sekaligus
+- Aktivasi/deaktivasi shift
+- Absensi otomatis menyesuaikan jam kerja berdasarkan shift yang dijadwalkan
 
 ### 📍 Fitur Geolocation
 - Validasi lokasi menggunakan **rumus Haversine** (perhitungan jarak dua titik koordinat)
@@ -74,6 +82,7 @@ Sistem ini memiliki dua panel utama:
 | **Excel I/O**   | [Maatwebsite Excel 3.x](https://laravel-excel.com/)          |
 | **Auth Token**  | Laravel Sanctum                                              |
 | **HTTP Client** | Guzzle                                                       |
+| **Code Style**  | Laravel Pint                                                 |
 
 ---
 
@@ -94,15 +103,15 @@ sistem-absensi-ptun/
 │   │   │   │   ├── DashboardController.php
 │   │   │   │   ├── InternshipController.php
 │   │   │   │   ├── OutsourcingController.php
-│   │   │   │   ├── PermissionController.php
 │   │   │   │   ├── ReportController.php
-│   │   │   │   └── SettingController.php
+│   │   │   │   ├── SettingController.php
+│   │   │   │   └── ShiftController.php
 │   │   │   ├── Employee/           # Controller panel pegawai
 │   │   │   │   ├── AttendanceController.php
 │   │   │   │   ├── DashboardController.php
-│   │   │   │   ├── HistoryController.php
-│   │   │   │   └── PermissionController.php
+│   │   │   │   └── HistoryController.php
 │   │   │   └── Auth/               # Controller autentikasi
+│   │   │       └── LoginController.php
 │   │   └── Middleware/
 │   │       └── RoleMiddleware.php   # Middleware cek role
 │   ├── Imports/                    # Import classes (Excel)
@@ -112,8 +121,9 @@ sistem-absensi-ptun/
 │   │   ├── AttendanceSetting.php
 │   │   ├── InternshipParticipant.php
 │   │   ├── OutsourcingEmployee.php
-│   │   ├── Permission.php
 │   │   ├── Role.php
+│   │   ├── Shift.php
+│   │   ├── ShiftSchedule.php
 │   │   └── User.php
 │   └── Providers/
 ├── database/
@@ -126,7 +136,17 @@ sistem-absensi-ptun/
 ├── resources/
 │   └── views/
 │       ├── admin/                  # View panel admin
+│       │   ├── attendance/         #   Monitoring kehadiran
+│       │   ├── dashboard.blade.php #   Dashboard admin
+│       │   ├── internship/         #   CRUD peserta magang
+│       │   ├── outsourcing/        #   CRUD pegawai outsourcing
+│       │   ├── reports/            #   Laporan absensi
+│       │   ├── settings/           #   Pengaturan absensi
+│       │   └── shifts/             #   Manajemen shift
 │       ├── employee/               # View panel pegawai
+│       │   ├── attendance/         #   Halaman absensi
+│       │   ├── dashboard.blade.php #   Dashboard pegawai
+│       │   └── history/            #   Riwayat kehadiran
 │       ├── auth/                   # View halaman login
 │       └── layouts/                # Layout template
 ├── routes/
@@ -139,13 +159,118 @@ sistem-absensi-ptun/
 
 ## 🗄️ Skema Database
 
-### Tabel `users`
+### Entity Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    roles ||--o{ users : "has many"
+    users ||--o| outsourcing_employees : "has one"
+    users ||--o| internship_participants : "has one"
+    users ||--o{ attendances : "has many"
+    users ||--o{ shift_schedules : "has many"
+    shifts ||--o{ shift_schedules : "has many"
+    shifts ||--o{ attendances : "has many"
+
+    roles {
+        bigint id PK
+        varchar name
+        varchar guard_name
+    }
+
+    users {
+        bigint id PK
+        bigint role_id FK
+        varchar name
+        varchar username UK
+        varchar email
+        varchar password
+        enum employee_type
+        varchar phone
+        text address
+        varchar photo
+        enum status
+    }
+
+    attendances {
+        bigint id PK
+        bigint user_id FK
+        bigint shift_id FK
+        date tanggal
+        time jam_masuk
+        time jam_pulang
+        decimal latitude_masuk
+        decimal longitude_masuk
+        decimal latitude_pulang
+        decimal longitude_pulang
+        decimal jarak_masuk
+        decimal jarak_pulang
+        varchar foto_masuk
+        varchar foto_pulang
+        enum status
+        text keterangan
+    }
+
+    shifts {
+        bigint id PK
+        varchar name
+        time jam_masuk_start
+        time jam_masuk_end
+        time batas_terlambat
+        time jam_pulang
+        boolean is_active
+    }
+
+    shift_schedules {
+        bigint id PK
+        bigint user_id FK
+        bigint shift_id FK
+        date tanggal
+    }
+
+    outsourcing_employees {
+        bigint id PK
+        bigint user_id FK
+        varchar company_name
+        varchar position
+        date contract_start
+        date contract_end
+        varchar contract_number
+    }
+
+    internship_participants {
+        bigint id PK
+        bigint user_id FK
+        varchar institution
+        varchar major
+        date start_date
+        date end_date
+        varchar supervisor
+    }
+
+    attendance_settings {
+        bigint id PK
+        decimal office_latitude
+        decimal office_longitude
+        varchar office_name
+        text office_address
+        integer max_radius_meters
+        time jam_masuk_start
+        time jam_masuk_end
+        time jam_pulang
+        time batas_terlambat
+    }
+```
+
+### Detail Tabel
+
+#### Tabel `users`
 | Kolom           | Tipe                       | Keterangan                    |
 | --------------- | -------------------------- | ----------------------------- |
 | id              | bigint (PK)                | Primary key                   |
 | role_id         | bigint (FK → roles)        | Relasi ke tabel roles         |
 | name            | varchar                    | Nama lengkap                  |
-| email           | varchar (unique)           | Email login                   |
+| username        | varchar (unique)           | Username untuk login          |
+| email           | varchar (nullable)         | Email (opsional)              |
 | password        | varchar                    | Password (hashed)             |
 | employee_type   | enum: outsourcing, magang  | Jenis pegawai (nullable)      |
 | phone           | varchar(20)                | Nomor telepon                 |
@@ -153,18 +278,19 @@ sistem-absensi-ptun/
 | photo           | varchar                    | Path foto profil              |
 | status          | enum: aktif, nonaktif      | Status akun                   |
 
-### Tabel `roles`
+#### Tabel `roles`
 | Kolom      | Tipe        | Keterangan   |
 | ---------- | ----------- | ------------ |
 | id         | bigint (PK) | Primary key  |
 | name       | varchar     | Nama role    |
 | guard_name | varchar     | Guard name   |
 
-### Tabel `attendances`
+#### Tabel `attendances`
 | Kolom            | Tipe                                        | Keterangan                         |
 | ---------------- | ------------------------------------------- | ---------------------------------- |
 | id               | bigint (PK)                                 | Primary key                        |
 | user_id          | bigint (FK → users)                         | Relasi ke user                     |
+| shift_id         | bigint (FK → shifts, nullable)              | Relasi ke shift (jika ada)         |
 | tanggal          | date                                        | Tanggal absensi                    |
 | jam_masuk        | time                                        | Waktu check-in                     |
 | jam_pulang       | time                                        | Waktu check-out                    |
@@ -181,7 +307,28 @@ sistem-absensi-ptun/
 
 > **Constraint**: Kombinasi `user_id` + `tanggal` bersifat **unique** (satu user hanya bisa absen satu kali per hari).
 
-### Tabel `attendance_settings`
+#### Tabel `shifts`
+| Kolom            | Tipe          | Keterangan                                   |
+| ---------------- | ------------- | -------------------------------------------- |
+| id               | bigint (PK)   | Primary key                                  |
+| name             | varchar       | Nama shift (misal: Shift Pagi, Shift Malam)  |
+| jam_masuk_start  | time          | Jam mulai boleh absen masuk                  |
+| jam_masuk_end    | time          | Jam akhir boleh absen masuk                  |
+| batas_terlambat  | time          | Batas jam dianggap terlambat                 |
+| jam_pulang       | time          | Jam pulang                                   |
+| is_active        | boolean       | Status aktif shift (default: true)           |
+
+#### Tabel `shift_schedules`
+| Kolom    | Tipe                 | Keterangan                           |
+| -------- | -------------------- | ------------------------------------ |
+| id       | bigint (PK)          | Primary key                          |
+| user_id  | bigint (FK → users)  | Relasi ke pegawai                    |
+| shift_id | bigint (FK → shifts) | Relasi ke shift                      |
+| tanggal  | date                 | Tanggal berlakunya jadwal shift      |
+
+> **Constraint**: Kombinasi `user_id` + `tanggal` bersifat **unique** (satu pegawai hanya bisa memiliki satu shift per hari).
+
+#### Tabel `attendance_settings`
 | Kolom              | Tipe          | Keterangan                        |
 | ------------------ | ------------- | --------------------------------- |
 | id                 | bigint (PK)   | Primary key                       |
@@ -195,20 +342,7 @@ sistem-absensi-ptun/
 | jam_pulang         | time          | Jam pulang                        |
 | batas_terlambat    | time          | Batas waktu sebelum dianggap terlambat |
 
-### Tabel `permissions` (Perizinan)
-| Kolom           | Tipe                                   | Keterangan                       |
-| --------------- | -------------------------------------- | -------------------------------- |
-| id              | bigint (PK)                            | Primary key                      |
-| user_id         | bigint (FK → users)                    | Pegawai yang mengajukan          |
-| tanggal_mulai   | date                                   | Tanggal mulai izin               |
-| tanggal_selesai | date                                   | Tanggal selesai izin             |
-| type            | enum: izin, sakit                      | Jenis perizinan                  |
-| keterangan      | text                                   | Alasan/keterangan                |
-| attachment      | varchar                                | File lampiran (surat dokter dll) |
-| status_approval | enum: pending, approved, rejected      | Status persetujuan               |
-| approved_by     | bigint (FK → users, nullable)          | Admin yang menyetujui            |
-
-### Tabel `outsourcing_employees`
+#### Tabel `outsourcing_employees`
 | Kolom           | Tipe                | Keterangan               |
 | --------------- | ------------------- | ------------------------ |
 | id              | bigint (PK)         | Primary key              |
@@ -219,7 +353,7 @@ sistem-absensi-ptun/
 | contract_end    | date                | Tanggal akhir kontrak    |
 | contract_number | varchar             | Nomor kontrak            |
 
-### Tabel `internship_participants`
+#### Tabel `internship_participants`
 | Kolom      | Tipe                | Keterangan            |
 | ---------- | ------------------- | --------------------- |
 | id         | bigint (PK)         | Primary key           |
@@ -335,9 +469,9 @@ http://sistem-absensi-ptun.test
 
 ## 🔑 Akun Default
 
-| Role      | Email                              | Password      |
-| --------- | ---------------------------------- | ------------- |
-| **Admin** | `admin@ptun-bandarlampung.go.id`   | `password123` |
+| Role      | Username  | Email                              | Password      |
+| --------- | --------- | ---------------------------------- | ------------- |
+| **Admin** | `admin`   | `admin@ptun-bandarlampung.go.id`   | `password123` |
 
 > ⚠️ **Penting**: Segera ganti password default setelah instalasi pertama!
 
@@ -347,24 +481,23 @@ http://sistem-absensi-ptun.test
 
 ### Sebagai Admin
 
-1. **Login** dengan akun admin
+1. **Login** dengan username & password admin
 2. **Dashboard** — Lihat ringkasan kehadiran & statistik
 3. **Kelola Outsourcing** — Tambah/edit/hapus data pegawai outsourcing
 4. **Kelola Magang** — Tambah/edit/hapus data peserta magang
 5. **Monitor Kehadiran** — Pantau absensi seluruh pegawai secara real-time
-6. **Kelola Perizinan** — Setujui atau tolak pengajuan izin/sakit
+6. **Kelola Shift** — Buat shift kerja, atur jadwal shift pegawai (khusus Satpam)
 7. **Laporan** — Filter, lihat, dan export laporan ke PDF/Excel
 8. **Pengaturan** — Konfigurasi lokasi kantor, radius, dan jam kerja
 9. **Import/Export** — Import data pegawai dari Excel atau export ke Excel
 
 ### Sebagai Pegawai
 
-1. **Login** dengan akun pegawai
+1. **Login** dengan username & password pegawai
 2. **Dashboard** — Lihat status kehadiran hari ini
 3. **Absensi Masuk** — Izinkan akses kamera & lokasi, ambil foto selfie, lalu submit
 4. **Absensi Pulang** — Sama seperti absensi masuk, dilakukan saat jam pulang
 5. **Riwayat** — Lihat histori kehadiran lengkap
-6. **Ajukan Izin** — Buat pengajuan izin/sakit dengan lampiran
 
 ---
 
@@ -402,6 +535,22 @@ http://sistem-absensi-ptun.test
 └─────────────┘     └──────────────┘     └──────────────┘     └───────────────┘
 ```
 
+### Alur Absensi dengan Shift (Satpam)
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐     ┌───────────────┐
+│  Admin      │────▶│  Buat Shift  │────▶│  Atur Jadwal │────▶│  Pegawai      │
+│  Setup      │     │  (Pagi/Malam)│     │  per Tanggal │     │  Terjadwal    │
+└─────────────┘     └──────────────┘     └──────────────┘     └───────┬───────┘
+                                                                       │
+                                                                       ▼
+                                                               ┌───────────────┐
+                                                               │  Absensi      │
+                                                               │  Sesuai Jam   │
+                                                               │  Shift        │
+                                                               └───────────────┘
+```
+
 ---
 
 ## 🧪 Menjalankan Tests
@@ -425,6 +574,9 @@ Atau menggunakan PHPUnit secara langsung:
 - Pastikan direktori `storage` memiliki permission yang sesuai
 - Gunakan `php artisan storage:link` untuk membuat symbolic link ke `public/storage`
 - Aplikasi menggunakan **Vite** sebagai build tool untuk asset frontend
+- Login menggunakan **username** (bukan email)
+- Fitur **Manajemen Shift** ditujukan khusus untuk pegawai dengan posisi **Satpam**
+- Tabel `permissions` (perizinan) telah dihapus dari sistem pada versi terbaru
 
 ---
 
