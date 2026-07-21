@@ -63,7 +63,17 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Jabatan/Tugas <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="position" value="{{ old('position', $outsourcing->outsourcingEmployee->position ?? '') }}" required>
+                            @php
+                                $oldPosition = old('position', $outsourcing->outsourcingEmployee->position ?? '');
+                                $isLainLain = $oldPosition && !in_array($oldPosition, ['Satpam', 'Cleaning service']);
+                            @endphp
+                            <select class="form-select mb-2" id="position_select" onchange="togglePositionInput()">
+                                <option value="" {{ !$oldPosition ? 'selected' : '' }} disabled>-- Pilih Jabatan --</option>
+                                <option value="Satpam" {{ $oldPosition == 'Satpam' ? 'selected' : '' }}>Satpam</option>
+                                <option value="Cleaning service" {{ $oldPosition == 'Cleaning service' ? 'selected' : '' }}>Cleaning service</option>
+                                <option value="Lain-lain" {{ $isLainLain ? 'selected' : '' }}>Lain-lain</option>
+                            </select>
+                            <input type="text" class="form-control" id="position_input" value="{{ $isLainLain ? $oldPosition : '' }}" placeholder="Masukkan Jabatan/Tugas" style="display: none;">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Tanggal Mulai Kontrak <span class="text-danger">*</span></label>
@@ -89,4 +99,27 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    togglePositionInput();
+});
+
+function togglePositionInput() {
+    var select = document.getElementById('position_select');
+    var input = document.getElementById('position_input');
+    
+    if (select.value === 'Lain-lain') {
+        input.style.display = 'block';
+        input.required = true;
+        input.name = 'position';
+        select.removeAttribute('name');
+    } else {
+        input.style.display = 'none';
+        input.required = false;
+        input.name = ''; 
+        select.name = 'position';
+    }
+}
+</script>
 @endsection
